@@ -159,7 +159,11 @@ arg (Just name) = Lam [Name name]
 res asVal = Res [AsValue asVal]
 ```
 
-The final paper will show how the signature is compiled into C code.
+The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
+Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
+The compilation of the function body is delegated to the Feldspar compiler.
+
+The final paper will show in more detail how the signature is compiled into C code.
 
 # Evaluation
 
