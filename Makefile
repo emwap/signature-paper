@@ -1,9 +1,5 @@
 all: paper.pdf
 
-%.pdf: %.tex
-	pdflatex $<
-	pdflatex $<
-
-%.tex: %.md Makefile
-	pandoc $< -o $@ -s --tab-stop=2 --number-sections
+paper.pdf: paper.md paper.bib Makefile
+	pandoc -s -o paper.pdf paper.md --filter pandoc-citeproc
 
