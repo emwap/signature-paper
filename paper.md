@@ -80,10 +80,6 @@ This paper presents two contributions.
 
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
 The signature language allows the programmer to express the mapping of individual arguments separately.
-The language is implemented using the deep/shallow technique [@svenningsson2013combining].
-
-The shallow embedding, which is also the programmer interface, provides combinators to describe the mapping of a function.
-The deep embedding is interpreted by the compiler to apply the rules.
 
 The basic combinators `arg` and `res`, are used for argument positions and the result respectively.
 
@@ -109,7 +105,7 @@ ptr = res False       -- | Return by reference
 
 ex1 = embed $ lam $ \x -> ptr "fun" (fun x)
 ```
-which generates the follow C signature when compiled
+which generates the following C signature when compiled
 ``` {.C|
 void fun(struct array * v0, uint32_t * out);
 ```
@@ -135,16 +131,40 @@ which produces
 uint32_t fun(struct array * vec);
 ```
 
+# Implementation
+
+The language is implemented using the technique of combining deep and shallow embeddings [@svenningsson2013combining].
+
+The shallow embedding, which is also the programmer interface, provides combinators to describe the mapping of a function.
+The deep embedding is interpreted by the compiler to apply the rules.
+
+By using two separate embeddings it is possible to have a small set of constructs that the compiler has deal with, while at the same time provide a rich set of combinators to the end user.
+
+``` {.haskell}
+-- | Annotations to place on arguments or result
+data Ann = AsValue Bool
+         | Name String
+
+-- | Annotation carrying signature description
+data Signature exp a where
+  Res :: (VarPred exp a)
+      => [Ann] -> String -> exp a -> Signature exp a
+  Lam :: (VarPred exp a)
+      => [Ann] -> (exp a -> Signature exp b)
+      -> Signature exp (a -> b)
+
+arg Nothing     = Lam []
+arg (Just name) = Lam [Name name]
+
+res asVal = Res [AsValue asVal]
+```
+
+The final paper will show how the signature is compiled into C code.
 
 # Evaluation
 
 # Related Work
 
-- How do they deal with this in Delite?
-- pragmas?
-- marks in MDD?
-- REPA has a polymorphic parameter in the `Array` type
-- Pull and Push arrays
-- Matlab Coder has some example based thing to specialize the type
+The final paper will consider techniques in other languages and systems, e.g. Scala Delite, the use of marks in model driven design and Matlab Coder.
 
 # References
