@@ -68,8 +68,8 @@ void crc(uint16_t v0, uint16_t v1, struct array * v3, uint16_t * out)
 
 # Motivation
 
-- __Export__ Feldspar functions to a C99 environment
-- Name arguments for readability
+- _Export_ Feldspar functions to a C99 environment
+- Name arguments for readability and debugging
 - Control data representation from a performance perspective
 
 # Contributions
@@ -143,7 +143,7 @@ sig = name "poly"  $ \p ->
 . . .
 
 ```c
-uint16_t crc(uint16_t poly, uint16_t ini, uint32_t len, uint8_t* v3_buf);
+uint16_t crc(uint16_t poly, uint16_t init, uint32_t len, uint8_t* v3_buf);
 ```
 
 # Implementation
@@ -183,10 +183,39 @@ data Signature exp a where
          => Ann exp a -> (exp a -> Signature exp b) -> Signature exp (a -> b)
 ```
 
+# Implementation
+
+``` {.haskell}
+translateFunction :: forall exp a.  (CompExp exp) => Signature exp a -> CodeGen ()
+translateFunction = go [] where
+    go :: forall d. [C.Param] -> Signature exp d -> CodeGen ()
+    go as (Ret n a) = do
+      t <- compType a
+      inFunctionTy t n $ do
+        addParams $ reverse as
+        e <- compExp a
+        addStm [cstm| return $e; |]
+    go as (Ptr n a) = do
+      t <- compType a
+      inFunction n $ do
+        addParams $ reverse as
+        e <- compExp a
+        addParam [cparam| $ty:t *out |]
+        addStm [cstm| *out = $e; |]
+-- other cases elided
+```
+
 # Conclusion
 
-- A language Signature translation
+- A Signature translation language
 - A reusable implementation based on `imperative-edsl`
+
+</br>
+</br>
+
+### Future work
+
+- Stacking of signature annotations
 
 # Thank You
 
