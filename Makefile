@@ -24,14 +24,16 @@ talk.tex: talk.md paper.bib Makefile
 	pandoc -o talk.tex talk.md ${TEX_OPTS}
 
 HTML_OPTS += ${OPTS}
+HTML_OPTS += --template revealjs.html
 HTML_OPTS += -t revealjs
 HTML_OPTS += -V theme=sky
 HTML_OPTS += -V transition=none
-# HTML_OPTS += --highlight-style=zenburn
-HTML_OPTS += --highlight-style=monochrome
-# HTML_OPTS += --no-highlight
 HTML_OPTS += --css=talk.css
-HTML_OPTS += -A init.html
+# HTML_OPTS += -A init.html
+# HTML_OPTS += --highlight-style=zenburn
+# HTML_OPTS += --highlight-style=monochrome
+HTML_OPTS += --no-highlight
+HTML_OPTS += -V hlss=tomorrow
 
 talk.html: talk.md talk.css paper.bib revealjs.html Makefile
 	pandoc -o talk.html talk.md ${HTML_OPTS}

@@ -10,18 +10,23 @@
 
 /* .reveal p { margin-bottom: 1em; text-align: left; } */
 
+.reveal pre code {
+  color: black;
+  background-color: white;
+}
+
 .reveal code {
   font-family: monospace;
   font-size: 80%;
 }
 
-.reveal pre code {
-  /* margin-bottom: 2em; */
-  /* padding-left: 0.2em; */
-  /* padding-right: 0.1em; */
-  /* font-family: monospace; */
-  font-size: 90%;
-}
+/* .reveal pre code { */
+/*   /1* margin-bottom: 2em; *1/ */
+/*   /1* padding-left: 0.2em; *1/ */
+/*   /1* padding-right: 0.1em; *1/ */
+/*   /1* font-family: monospace; *1/ */
+/*   font-size: 90%; */
+/* } */
 
 /* .reveal code { */
 /*   background-color: transparent; */
