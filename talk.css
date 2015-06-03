@@ -1,0 +1,32 @@
+
+.reveal h1  {
+  font-size: 2em;
+  /* line-height: 1.1em; */
+}
+
+.reveal .author { font-size: 1em; line-height: 1.1em; }
+
+/* .reveal table { margin-right: auto; margin-left: auto; } */
+
+/* .reveal p { margin-bottom: 1em; text-align: left; } */
+
+.reveal code {
+  font-family: monospace;
+  font-size: 80%;
+}
+
+.reveal pre code {
+  /* margin-bottom: 2em; */
+  /* padding-left: 0.2em; */
+  /* padding-right: 0.1em; */
+  /* font-family: monospace; */
+  font-size: 90%;
+}
+
+/* .reveal code { */
+/*   background-color: transparent; */
+/* } */
+/* .reveal code span.dt { */
+/*   font-style: italic; */
+/* } */
+
