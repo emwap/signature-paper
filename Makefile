@@ -5,8 +5,8 @@ all: paper.pdf talk.pdf talk.html
 clean:
 	rm -f paper.pdf talk.pdf talk.tex talk.html
 
-paper.pdf: paper.md paper.bib Makefile
-	pandoc -s -o paper.pdf paper.md --filter pandoc-citeproc
+paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs
+	pandoc -s -o paper.pdf paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
 
 OPTS += --smart
 OPTS += --bibliography paper.bib
