@@ -6,10 +6,10 @@ clean:
 	rm -f paper.pdf talk.pdf talk.tex talk.html
 
 paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs
-	pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
+	cabal exec -- pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
 
 paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs
-	pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
+	cabal exec -- pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
 
 OPTS += --smart
 OPTS += --bibliography paper.bib
