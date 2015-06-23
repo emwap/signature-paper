@@ -13,6 +13,7 @@ abstract: |
 
 numbersections: true
 bibliography: paper.bib
+csl: springer-lecture-notes-in-computer-science.csl
 filter: pandoc-citeproc
 header-includes: |
   \institute{Chalmers University of Technology}
