@@ -148,6 +148,8 @@ uint32_t fun(struct array * vec);
 
 # Implementation
 
+\todo{Describe the C-monad and CompExp}
+
 The language is implemented using the technique of combining deep and shallow embeddings [@svenningsson2013combining].
 
 The shallow embedding, which is also the programmer interface, provides combinators to describe the mapping of a function.
@@ -182,7 +184,7 @@ The final paper will show in more detail how the signature is compiled into C co
 
 
 
-# Evaluation
+# Discussion and Future Work
 
 - Generialization of the Signature language is future work
 
