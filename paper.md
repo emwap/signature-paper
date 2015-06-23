@@ -21,6 +21,10 @@ header-includes: |
 ---
 
 
+\newcommand{\todo}[1]{\marginpar{\scriptsize\textcolor{red}{TODO~{#1}}}}
+
+\todo{Indent code listings}
+
 # Introduction
 
   <!--
@@ -68,6 +72,8 @@ With a fixed signature mapping it is easy to derive the target language type fro
 Many compilers provide options to change the interpretation of program elements.
 However, these options take effect for the entire invocation of the compiler, meaning that it is not possible to apply options only to some elements.
 
+\todo{Describe the problem better}
+
 - Compare with pragmas, such as `inline`, `UNPACK`, `restrict`, `volatile`, etc.
 
 ## Contributions
@@ -85,7 +91,7 @@ The signature language allows the programmer to express the mapping of individua
 
 The basic combinators `arg` and `res`, are used for argument positions and the result respectively.
 
-``` {.haskell}
+``` {.haskell #lst:sig-lang caption="Signature language"}
 arg :: (VarPred exp a)
     => Maybe String -> (exp a -> Signature exp b) -> Signature exp (a -> b)
 res :: (VarPred exp a)
