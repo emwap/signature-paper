@@ -65,6 +65,8 @@ By passing arrays as references bundled with their length, the Feldspar Compiler
 However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties.
 For example, to access the data buffer in a `struct array *`{.C} an extra pointer dereference is required as compared to a normal array access.
 
+
+
 ## Issues with Fixed Mappings
 
 With a fixed signature mapping it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrappers have to be written and maintained.
@@ -76,13 +78,17 @@ However, these options take effect for the entire invocation of the compiler, me
 
 - Compare with pragmas, such as `inline`, `UNPACK`, `restrict`, `volatile`, etc.
 
+
+
 ## Contributions
 
 This paper presents two contributions.
 
-- An EDSL to specify the conversion of types when embedding a function in host EDSL.
+- An EDSL to specify the conversion of types when embedding a function in a host EDSL.
 
-- An implementation of the EDSL as part of the Feldspar System Layer
+- An implementation of the EDSL for the Feldspar language.
+
+
 
 # The Signature Language
 
@@ -139,6 +145,7 @@ which produces
 uint32_t fun(struct array * vec);
 ```
 
+
 # Implementation
 
 The language is implemented using the technique of combining deep and shallow embeddings [@svenningsson2013combining].
@@ -173,10 +180,18 @@ The compilation of the function body is delegated to the Feldspar compiler.
 
 The final paper will show in more detail how the signature is compiled into C code.
 
+
+
 # Evaluation
+
+- Generialization of the Signature language is future work
+
+
 
 # Related Work
 
 The final paper will consider techniques in other languages and systems, e.g. Scala Delite, the use of marks in model driven design and Matlab Coder.
+
+
 
 # References
