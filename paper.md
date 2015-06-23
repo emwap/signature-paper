@@ -14,6 +14,7 @@ abstract: |
 numbersections: true
 bibliography: paper.bib
 csl: springer-lecture-notes-in-computer-science.csl
+link-citations: true
 filter: pandoc-citeproc
 header-includes: |
   \institute{Chalmers University of Technology}
@@ -28,7 +29,7 @@ header-includes: |
 - A fixed mapping is too restrictive
   -->
 
-The Feldspar language [@FeldsparMemocode; @FeldsparIFL2010] is an embedded domain specific language written in Haskell.
+The Feldspar language [@axelsson2010feldspar; @axelsson2010design] is an embedded domain specific language written in Haskell.
 The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems [@persson2014towards].
 
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.
