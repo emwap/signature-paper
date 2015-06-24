@@ -35,6 +35,40 @@ import Text.PrettyPrint.Mainland
 
 -- TODO move Signature and translateFunction to feldspar-compiler-shim
 
+-- * Combinators
+
+lam :: (VarPred Data a)
+    => (Data a -> Signature Data b) -> Signature Data (a -> b)
+lam f = Lam Empty $ \x -> f x
+
+name :: (VarPred Data a)
+     => String -> (Data a -> Signature Data b) -> Signature Data (a -> b)
+name s f = Lam (Named s) $ \x -> f x
+
+ret,ptr :: (VarPred Data a)
+        => String -> Data a -> Signature Data a
+ret = Ret
+ptr = Ptr
+
+arg :: (VarPred Data a)
+    => Ann Data a -> (Data a -> Data b) -> (Data b -> Signature Data c) -> Signature Data (a -> c)
+arg s g f = Lam s $ \x -> f (g x)
+
+-- * Feldspar Combinators
+
+native :: (Type a)
+       => Data F.Length -> (Data [a] -> Signature Data b) -> Signature Data ([a] -> b)
+native l f = Lam (Native l) $ \a -> f $ F.setLength l a
+
+exposeLength :: (Type a)
+             => (Data [a] -> Signature Data b) -> Signature Data (F.Length -> [a] -> b)
+exposeLength f = name "len" $ \l -> native l f
+
+capped :: (Type a) => F.Size a -> (Data a -> Signature Data b) -> Signature Data (a -> b)
+capped sz = arg Empty (F.cap sz)
+
+
+-- * Language
 data Ann exp a where
   Empty  :: Ann exp a
   Native :: VarPred exp a => Data F.Length -> Ann exp [a]
@@ -50,6 +84,10 @@ cgenSig :: (CompExp exp)
         => Signature exp a -> Doc
 cgenSig = prettyCGen . translateFunction
 
+
+-- * Compilation
+
+-- | Compile a @Signature@ to C code
 translateFunction :: forall exp m a
                   .  (CompExp exp, MonadC m)
                   => Signature exp a -> m ()
@@ -97,38 +135,4 @@ translateFunction sig = go sig (return ())
 
     appendId :: C.Id -> String -> C.Id
     appendId (C.Id s loc) suf = C.Id (s++suf) loc
-
-
--- * Combinators
-
-lam :: (VarPred Data a)
-    => (Data a -> Signature Data b) -> Signature Data (a -> b)
-lam f = Lam Empty $ \x -> f x
-
-name :: (VarPred Data a)
-     => String -> (Data a -> Signature Data b) -> Signature Data (a -> b)
-name s f = Lam (Named s) $ \x -> f x
-
-ret,ptr :: (VarPred Data a)
-        => String -> Data a -> Signature Data a
-ret = Ret
-ptr = Ptr
-
-arg :: (VarPred Data a)
-    => Ann Data a -> (Data a -> Data b) -> (Data b -> Signature Data c) -> Signature Data (a -> c)
-arg s g f = Lam s $ \x -> f (g x)
-
--- * Feldspar Combinators
-
-native :: (Type a)
-       => Data F.Length -> (Data [a] -> Signature Data b) -> Signature Data ([a] -> b)
-native l f = Lam (Native l) $ \a -> f $ F.setLength l a
-
-exposeLength :: (Type a)
-             => (Data [a] -> Signature Data b) -> Signature Data (F.Length -> [a] -> b)
-exposeLength f = name "len" $ \l -> native l f
-
-capped :: (Type a) => F.Size a -> (Data a -> Signature Data b) -> Signature Data (a -> b)
-capped sz = arg Empty (F.cap sz)
-
 
