@@ -1,0 +1,12 @@
+[submodule "imperative-edsl"]
+	path = imperative-edsl
+	url = git://github.com/emilaxelsson/imperative-edsl.git
+[submodule "feldspar-language"]
+	path = feldspar-language
+	url = git://github.com/feldspar/feldspar-language.git
+[submodule "feldspar-compiler-shim"]
+	path = feldspar-compiler-shim
+	url = git://github.com/emwap/feldspar-compiler-shim.git
+[submodule "feldspar-compiler"]
+	path = feldspar-compiler
+	url = git://github.com/feldspar/feldspar-compiler.git
