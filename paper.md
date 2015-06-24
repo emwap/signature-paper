@@ -34,7 +34,7 @@ header-includes: |
 - A fixed mapping is too restrictive
   -->
 
-The Feldspar language [@axelsson2010feldspar; @axelsson2010design] is an embedded domain specific language written in Haskell.
+Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].
 The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems [@persson2014towards].
 
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.
@@ -46,38 +46,60 @@ When translating a function signature, the compiler uses a specific calling conv
 - All functions return `void`{.C}
 - Return values are passed through caller provided pointers
 
-For example, a Feldspar function with type
+For example, the following is the type of an FFT function in Feldspar:
 
 ``` {.haskell}
 fft :: Data [Double] -> Data [Double]
 ```
-is translated into the C99 signature
+The type constructor `Data` denotes a Feldspar expression, and its parameter denotes the type of value computed by that expression. For historical reasons, Feldspar uses `[]` to denote immutable arrays.
+
+When compiled, the `fft` is translated into the C99 signature
 
 ``` {.C}
 void fft(struct array *, struct array * *);
 ```
-where `struct array`{.C} is a Feldspar specific data structure with metadata and a pointer to the data area.
+where `struct array`{.C} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
 
-The Feldspar compiler uses this convention for a number of reasons, but the primary reason is consistency.
+The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
 
-By passing arrays as references bundled with their length, the Feldspar Compiler can generate code that works with different array sizes and still preserve the same number of arguments.
-
-
-However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties.
-For example, to access the data buffer in a `struct array *`{.C} an extra pointer dereference is required as compared to a normal array access.
+However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will usually be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
 
 
 
 ## Issues with Fixed Mappings
 
-With a fixed signature mapping it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrappers have to be written and maintained.
+With a fixed signature mapping it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrapper functions have to be written and maintained.
 
+In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for several arrays if they always have the same length? And so on.
+
+Even if we allow flags to customize the compiler, it is clear that a fixed set of mapping rules will never be able to cover all possible situations. Instead, we would like to put the exported signature in the hands of the programmer.
+
+  <!--
 Many compilers provide options to change the interpretation of program elements.
 However, these options take effect for the entire invocation of the compiler, meaning that it is not possible to apply options only to some elements.
+  -->
 
-\todo{Describe the problem better}
+As a concrete example, take the following function for computing the scalar product of two vectors:
 
-- Compare with pragmas, such as `inline`, `UNPACK`, `restrict`, `volatile`, etc.
+``` {.haskell}
+scProd :: Data [Double] -> Data [Double] -> Data Double
+```
+The generated signature with the default mapping is:
+
+``` {.C}
+void scProd(struct array * v0, struct array * v1, double * out);
+```
+(By default, the Feldspar compiler automatically makes up names for the arguments.)
+Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
+
+``` {.C}
+void scProd(double * v0, double * v1, int length, double * out);
+```
+Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may very well expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
+
+In addition to being able to customize the calling convention, we might also want to affect non-functional aspects of functions.
+
+\todo{Variable names, annotations: `inline`, `UNPACK`, `restrict`, `volatile`, etc.}
 
 
 
