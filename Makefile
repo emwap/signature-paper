@@ -5,15 +5,23 @@ all: paper.pdf talk.pdf talk.html
 clean:
 	rm -f paper.pdf talk.pdf talk.tex talk.html
 
-paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs
-	cabal exec -- pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
-
-paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs
-	cabal exec -- pandoc -s -o $@ paper.md --filter pandoc-citeproc --filter filters/fix-biblio.hs
-
 OPTS += --smart
 OPTS += --bibliography paper.bib
 OPTS += --self-contained
+
+PAPER_OPTS += ${OPTS}
+PAPER_OPTS += --listings
+PAPER_OPTS += --filter pandoc-citeproc
+PAPER_OPTS += --filter filters/fix-biblio.hs
+
+paper.tex: paper.md paper.bib Makefile filters/fix-biblio.hs
+	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
+
+paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs
+	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
+
+paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs
+	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
 TEX_OPTS += ${OPTS}
 TEX_OPTS += -t beamer
