@@ -105,11 +105,10 @@ In addition to being able to customize the calling convention, we might also wan
 
 ## Contributions
 
-This paper presents two contributions.
+To address the problems above, this paper presents two contributions:
 
-- An EDSL to specify the conversion of types when embedding a function in a host EDSL.
-
-- An implementation of the EDSL for the Feldspar language.
+- We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (section\ \ref{the-signature-language}).
+- We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (section\ \ref{implementation}). The implementation relies on a simple interface to the underlying compiler, and the technique can easily be ported to other EDSLs for which the compiler implements the same interface.
 
 
 
