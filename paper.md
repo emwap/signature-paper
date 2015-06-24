@@ -26,6 +26,14 @@ header-includes: |
 \newcommand{\todo}[1]{\marginpar{\scriptsize\textcolor{red}{TODO~{#1}}}}
 
 
+``` {.haskell .hide}
+import Feldspar (Data,Word32)
+import qualified Feldspar as F
+import qualified Feldspar.Vector as F
+import qualified Feldspar.Algorithm.CRC as F
+import Feldspar.Compiler.Signature
+```
+
 
 # Introduction
 
@@ -49,7 +57,7 @@ When translating a function signature, the compiler uses a specific calling conv
 
 For example, the following is the type of an FFT function in Feldspar:
 
-``` {.haskell}
+``` {.haskell .skip}
 fft :: Data [Double] -> Data [Double]
 ```
 The type constructor `Data` denotes a Feldspar expression, and its parameter denotes the type of value computed by that expression. For historical reasons, Feldspar uses `[]` to denote immutable arrays.
@@ -139,24 +147,22 @@ As a running example, we use the following Feldspar function which takes an arra
 
 ``` {.haskell}
 fun :: Data [Word32] -> Data Word32
+fun as = F.forLoop (F.getLength as) 0 ((+) . F.i2n)
 ```
 
 We can mimic the standard rules of the Feldspar compiler by wrapping the function in our combinators.
 
 ``` {.haskell}
-lam = arg Nothing     -- | Capture an argument without naming
-ptr = res False       -- | Return by reference
-
 ex1 = lam $ \x -> ptr "fun" (fun x)
 ```
 which generates the following C signature when compiled
-``` {.C|
+``` {.C}
 void fun(struct array * v0, uint32_t * out);
 ```
 
 We change the embedding to name the first argument
 ``` {.haskell}
-ex2 = named "vec" $ \x -> ptr "fun" (fun x)
+ex2 = name "vec" $ \x -> ptr "fun" (fun x)
 ```
 resulting in
 ``` {.C}
@@ -164,10 +170,10 @@ void fun(struct array * vec, uint32_t * out);
 ```
 
 Finally, we change the function to return by value
-``` {.haskell}
+``` {.haskell .skip}
 ret = res True        -- | Return by value
 
-ex3 = named "vec" $ \x -> ret "fun" (fun x)
+ex3 = name "vec" $ \x -> ret "fun" (fun x)
 ```
 which produces
 
@@ -214,7 +220,17 @@ The final paper will show in more detail how the signature is compiled into C co
 
 - Generialization of the Signature language is future work
 
+``` {.haskell}
+sig :: Signature Data (F.WordN -> [Word32] -> [Word32] -> Word32)
+sig = name "len" $ \len ->
+      native len $ \as  ->
+      native len $ \bs  ->
+      ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
+```
 
+``` {.ghci}
+cgenSig sig
+```
 
 # Related Work
 

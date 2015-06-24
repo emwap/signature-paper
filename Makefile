@@ -13,14 +13,15 @@ PAPER_OPTS += ${OPTS}
 PAPER_OPTS += --listings
 PAPER_OPTS += --filter pandoc-citeproc
 PAPER_OPTS += --filter filters/fix-biblio.hs
+PAPER_OPTS += --filter filters/ghci.hs
 
-paper.tex: paper.md paper.bib Makefile filters/fix-biblio.hs
+paper.tex: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
 	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
-paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs
+paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
 	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
-paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs
+paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
 	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
 TEX_OPTS += ${OPTS}
