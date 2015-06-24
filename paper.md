@@ -18,6 +18,7 @@ link-citations: true
 filter: pandoc-citeproc
 header-includes: |
   \institute{Chalmers University of Technology}
+  \input{listings_haskell.tex}
 ---
 
 
@@ -97,7 +98,7 @@ The signature language allows the programmer to express the mapping of individua
 
 The basic combinators `arg` and `res`, are used for argument positions and the result respectively.
 
-``` {.haskell #lst:sig-lang caption="Signature language"}
+``` {.haskell #lst:sig-lang style=float caption="Signature language"}
 arg :: (VarPred exp a)
     => Maybe String -> (exp a -> Signature exp b) -> Signature exp (a -> b)
 res :: (VarPred exp a)
