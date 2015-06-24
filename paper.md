@@ -19,6 +19,7 @@ filter: pandoc-citeproc
 header-includes: |
   \institute{Chalmers University of Technology}
   \input{listings_haskell.tex}
+  \usepackage{cleveref}
 ---
 
 
@@ -119,11 +120,18 @@ The signature language allows the programmer to express the mapping of individua
 
 The basic combinators `arg` and `res`, are used for argument positions and the result respectively.
 
-``` {.haskell #lst:sig-lang style=float caption="Signature language"}
-arg :: (VarPred exp a)
-    => Maybe String -> (exp a -> Signature exp b) -> Signature exp (a -> b)
-res :: (VarPred exp a)
-    => Bool -> String -> exp a -> Signature exp a
+``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
+-- | Capture an argument
+lam :: (VarPred Data a)
+    => (Data a -> Signature Data b) -> Signature Data (a -> b)
+
+-- | Capture and name an argument
+name :: (VarPred Data a)
+     => String -> (Data a -> Signature Data b) -> Signature Data (a -> b)
+
+-- | Create a named function return either by value or reference
+ret,ptr :: (VarPred Data a)
+        => String -> Data a -> Signature Data a
 ```
 
 
@@ -174,28 +182,24 @@ uint32_t fun(struct array * vec);
 
 The language is implemented using the technique of combining deep and shallow embeddings [@svenningsson2013combining].
 
-The shallow embedding, which is also the programmer interface, provides combinators to describe the mapping of a function.
-The deep embedding is interpreted by the compiler to apply the rules.
+The shallow embedding (\cref{lst:signature-shallow}), which is also the programmer interface, provides combinators to describe the mapping of a function.
+The deep embedding (\cref{lst:signature-deep}) is interpreted by the compiler to apply the rules.
 
-By using two separate embeddings it is possible to have a small set of constructs that the compiler has deal with, while at the same time provide a rich set of combinators to the end user.
+By using two separate embeddings it is possible to have a small set of constructs that the compiler has to deal with, while at the same time provide a rich set of combinators to the end user.
 
-``` {.haskell}
+``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
-data Ann = AsValue Bool
-         | Name String
+data Ann exp a where
+  Empty  :: Ann exp a
+  Native :: VarPred exp a => Data F.Length -> Ann exp [a]
+  Named  :: String -> Ann exp a
 
 -- | Annotation carrying signature description
 data Signature exp a where
-  Res :: (VarPred exp a)
-      => [Ann] -> String -> exp a -> Signature exp a
-  Lam :: (VarPred exp a)
-      => [Ann] -> (exp a -> Signature exp b)
-      -> Signature exp (a -> b)
-
-arg Nothing     = Lam []
-arg (Just name) = Lam [Name name]
-
-res asVal = Res [AsValue asVal]
+  Ret    :: (VarPred exp a) => String -> exp a -> Signature exp a
+  Ptr    :: (VarPred exp a) => String -> exp a -> Signature exp a
+  Lam    :: (VarPred exp a)
+         => Ann exp a -> (exp a -> Signature exp b) -> Signature exp (a -> b)
 ```
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
