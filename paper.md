@@ -118,7 +118,7 @@ We can mimic the standard rules of the Feldspar compiler by wrapping the functio
 lam = arg Nothing     -- | Capture an argument without naming
 ptr = res False       -- | Return by reference
 
-ex1 = embed $ lam $ \x -> ptr "fun" (fun x)
+ex1 = lam $ \x -> ptr "fun" (fun x)
 ```
 which generates the following C signature when compiled
 ``` {.C|
@@ -127,7 +127,7 @@ void fun(struct array * v0, uint32_t * out);
 
 We change the embedding to name the first argument
 ``` {.haskell}
-ex2 = embed $ arg (Just "vec") $ \x -> ptr "fun" (fun x)
+ex2 = named "vec" $ \x -> ptr "fun" (fun x)
 ```
 resulting in
 ``` {.C}
@@ -138,7 +138,7 @@ Finally, we change the function to return by value
 ``` {.haskell}
 ret = res True        -- | Return by value
 
-ex3 = embed $ arg (Just "vec") $ \x -> ret "fun" (fun x)
+ex3 = named "vec" $ \x -> ret "fun" (fun x)
 ```
 which produces
 
