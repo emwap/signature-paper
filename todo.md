@@ -1,7 +1,7 @@
 # TODO
 
 - [ ] Describe the problem better
-- [ ] Indent code listings
+- [x] Indent code listings
 - [ ] Specialize implementation for Feldspar
 - [x] Move Feldspar.System.Signature to Feldspar.Compiler.Signature
 - [x] Break out signature-paper to it's own repository

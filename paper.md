@@ -24,7 +24,7 @@ header-includes: |
 
 \newcommand{\todo}[1]{\marginpar{\scriptsize\textcolor{red}{TODO~{#1}}}}
 
-\todo{Indent code listings}
+
 
 # Introduction
 
