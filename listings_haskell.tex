@@ -1,0 +1,101 @@
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage[scaled]{beramono}
+
+\lstloadlanguages{[ANSI]C,Haskell}
+
+\lstdefinestyle{numbers}
+    { style=haskell
+    , numbers=left
+    , stepnumber=1
+    , numberstyle=\tiny
+    }
+
+\lstdefinestyle{nonumbers}
+    { style=haskell
+    , numbers=none
+    }
+
+\lstdefinestyle{ghci}
+    {
+    }
+
+\lstdefinestyle{errorstyle}
+    { basicstyle=\color{red}\ttfamily
+    , numbers=none
+    }
+
+\lstdefinestyle{float}
+    { style=haskell
+    , float=tb
+    , frame=tb
+    , captionpos=b
+    , emptylines=1
+    , numberbychapter=true
+    }
+
+\lstdefinestyle{haskell}
+    { language=Haskell
+    % , keywords={where
+    %            ,let
+    %            ,in
+    %            ,if
+    %            ,then
+    %            ,else
+    %            ,case
+    %            ,of
+    %            ,do
+    %            ,type
+    %            ,data
+    %            ,class
+    %            ,instance
+    %            ,family
+    %            ,newtype
+    %            ,deriving
+    %            }
+    % , otherkeywords={::}
+    , commentstyle=\color[rgb]{0.38,0.63,0.69}\itshape
+    % , keywordstyle=\textcolor[rgb]{0.00,0.44,0.13}\bfseries
+    % , keywordstyle=\bfseries
+    , stringstyle=\textcolor[rgb]{0.25,0.44,0.63}
+    , literate=*
+        {>=}{{$\geq$}}2
+        {<=}{{$\leq$}}2
+        {\\}{{$\lambda$}}1
+        {\\\\}{{\char`\\\char`\\}}1
+        {>->}{{$\rightarrowtail$}}2
+        {->}{{$\rightarrow$}}2
+        {<-}{{$\leftarrow$}}2
+        {=>}{{$\Rightarrow$}}2
+        {<>}{{$\circ$}}1
+        {>>=}{{>>=}}3
+        % {>>}{{>{>}}}2
+        % {forall}{{$\forall$}}1
+        {undefined}{{$\ldots$}}3
+        {_=()}{{$\ldots$}}3
+    }
+
+\lstdefinestyle{fancyvrb}
+    { fancyvrb=true
+    }
+
+\lstdefinestyle{rangemarkers}
+    { style=haskell
+    , rangebeginprefix=----\ \{\ %
+    , rangeendprefix=----\ \}\ %
+    , includerangemarker=false
+    }
+
+\lstset
+    { style=haskell
+    , basicstyle=\fontsize{8}{10}\fontencoding{T1}\ttfamily
+    , keepspaces=true
+    , showspaces=false
+    , showstringspaces=false
+    , breaklines=true
+    , frame=tb
+    }
+\lstset{ style=numbers
+       , captionpos=b
+       }
+
