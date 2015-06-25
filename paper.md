@@ -90,7 +90,7 @@ However, these options take effect for the entire invocation of the compiler, me
 
 As a concrete example, take the following function for computing the scalar product of two vectors:
 
-``` {.haskell}
+``` {.haskell .skip}
 scProd :: Data [Double] -> Data [Double] -> Data Double
 ```
 The generated signature with the default mapping is:
@@ -116,8 +116,8 @@ In addition to being able to customize the calling convention, we might also wan
 
 To address the problems above, this paper presents two contributions:
 
-- We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (section\ \ref{the-signature-language}).
-- We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (section\ \ref{implementation}). The implementation relies on a simple interface to the underlying compiler, and the technique can easily be ported to other EDSLs for which the compiler implements the same interface.
+- We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (\cref{the-signature-language}).
+- We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (\cref{implementation}). The implementation relies on a simple interface to the underlying compiler, and the technique can easily be ported to other EDSLs for which the compiler implements the same interface.
 
 
 
