@@ -126,7 +126,7 @@ To address the problems above, this paper presents two contributions:
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
 The signature language allows the programmer to express the mapping of individual arguments separately.
 
-The basic combinators `arg` and `res`, are used for argument positions and the result respectively.
+The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
 
 ``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
 -- | Capture an argument
@@ -156,8 +156,8 @@ We can mimic the standard rules of the Feldspar compiler by wrapping the functio
 ex1 = lam $ \x -> ptr "fun" (fun x)
 ```
 which generates the following C signature when compiled
-``` {.C}
-void fun(struct array * v0, uint32_t * out);
+``` {.ghci}
+cgenProto ex1
 ```
 
 We change the embedding to name the first argument
@@ -165,20 +165,18 @@ We change the embedding to name the first argument
 ex2 = name "vec" $ \x -> ptr "fun" (fun x)
 ```
 resulting in
-``` {.C}
-void fun(struct array * vec, uint32_t * out);
+``` {.ghci}
+cgenProto ex2
 ```
 
 Finally, we change the function to return by value
-``` {.haskell .skip}
-ret = res True        -- | Return by value
-
+``` {.haskell}
 ex3 = name "vec" $ \x -> ret "fun" (fun x)
 ```
 which produces
 
-``` {.C}
-uint32_t fun(struct array * vec);
+``` {.ghci}
+cgenProto ex3
 ```
 
 
