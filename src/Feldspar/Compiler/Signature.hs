@@ -83,6 +83,13 @@ data Signature a where
 cgenSig :: Signature a -> Doc
 cgenSig = prettyCGen . translateFunction
 
+cgenProto :: (CompExp exp)
+          => Signature exp a -> Doc
+cgenProto sig = ppr $ cenvToCUnit cenv
+  where
+    env = defaultCEnv Flags
+    cenv = onlyProto $ snd $ runCGen (translateFunction sig) env
+    onlyProto e = env {_prototypes = _prototypes e}
 
 -- * Compilation
 
