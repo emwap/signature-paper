@@ -226,7 +226,7 @@ sig = name "len" $ \len ->
 ```
 
 ``` {.ghci}
-cgenSig sig
+cgenDefinition sig
 ```
 
 # Related Work

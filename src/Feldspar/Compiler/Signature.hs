@@ -84,11 +84,14 @@ cgenSig :: Signature a -> Doc
 cgenSig = prettyCGen . translateFunction
 
 cgenProto :: Signature a -> Doc
-cgenProto sig = ppr $ cenvToCUnit cenv
+cgenProto sig = ppr $ _prototypes $ snd $ runCGen (translateFunction sig) env
   where
     env = defaultCEnv Flags
-    cenv = onlyProto $ snd $ runCGen (translateFunction sig) env
-    onlyProto e = env {_prototypes = _prototypes e}
+
+cgenDefinition :: Signature a -> Doc
+cgenDefinition sig = ppr $ _globals $ snd $ runCGen (translateFunction sig) env
+  where
+    env = defaultCEnv Flags
 
 -- * Compilation
 
