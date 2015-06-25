@@ -90,13 +90,16 @@ However, these options take effect for the entire invocation of the compiler, me
 
 As a concrete example, take the following function for computing the scalar product of two vectors:
 
-``` {.haskell .skip}
+``` {.haskell}
 scProd :: Data [Double] -> Data [Double] -> Data Double
+```
+``` {.haskell .hide}
+scProd as bs = F.desugar $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
 ```
 The generated signature with the default mapping is:
 
-``` {.C}
-void scProd(struct array * v0, struct array * v1, double * out);
+``` {.ghci}
+cgenProto $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
 (By default, the Feldspar compiler automatically makes up names for the arguments.)
 Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
@@ -104,6 +107,7 @@ Apart from the problem that Feldspar's `struct array` is an unconventional array
 ``` {.C}
 void scProd(double * v0, double * v1, int length, double * out);
 ```
+\todo{We cannot really produce this with `native` since we need the length before it is captured}
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may very well expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
 
 In addition to being able to customize the calling convention, we might also want to affect non-functional aspects of functions.
@@ -124,7 +128,7 @@ To address the problems above, this paper presents two contributions:
 # The Signature Language
 
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
-The signature language allows the programmer to express the mapping of individual arguments separately.
+The Signature language allows the programmer to express the mapping of individual arguments separately.
 
 The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
 
@@ -141,20 +145,15 @@ ptr :: (Type a) => String -> Data a -> Signature a
 ```
 
 
-As a running example, we use the following Feldspar function which takes an array of words into a single word.
+As a running example, we will reuse the `scProd`{.haskell} function from \cref{issues-with-fixed-mappings}.
 
-``` {.haskell}
-fun :: Data [Word32] -> Data Word32
+``` {.haskell .skip}
+scProd :: Data [Double] -> Data [Double] -> Data Double
 ```
-
-``` {.haskell .hide}
-fun as = F.forLoop (F.getLength as) 0 ((+) . F.i2n)
-```
-
 We can mimic the standard rules of the Feldspar compiler by wrapping the function in our combinators.
 
 ``` {.haskell}
-ex1 = lam $ \x -> ptr "fun" (fun x)
+ex1 = lam $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 which generates the following C signature when compiled
 ``` {.ghci}
@@ -163,7 +162,7 @@ cgenProto ex1
 
 We change the embedding to name the first argument
 ``` {.haskell}
-ex2 = name "vec" $ \x -> ptr "fun" (fun x)
+ex2 = name "xs" $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 resulting in
 ``` {.ghci}
@@ -172,7 +171,7 @@ cgenProto ex2
 
 Finally, we change the function to return by value
 ``` {.haskell}
-ex3 = name "vec" $ \x -> ret "fun" (fun x)
+ex3 = name "xs" $ \xs -> name "ys" $ \ys -> ret "scProd" (scProd xs ys)
 ```
 which produces
 
@@ -220,11 +219,10 @@ The final paper will show in more detail how the signature is compiled into C co
 - Generialization of the Signature language is future work
 
 ``` {.haskell}
-sig :: Signature (F.WordN -> [Word32] -> [Word32] -> Word32)
 sig = name "len" $ \len ->
       native len $ \as  ->
       native len $ \bs  ->
-      ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
+      ret "scProd" $ scProd as bs
 ```
 
 ``` {.ghci}
