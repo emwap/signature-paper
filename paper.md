@@ -147,6 +147,9 @@ As a running example, we use the following Feldspar function which takes an arra
 
 ``` {.haskell}
 fun :: Data [Word32] -> Data Word32
+```
+
+``` {.haskell .hide}
 fun as = F.forLoop (F.getLength as) 0 ((+) . F.i2n)
 ```
 
