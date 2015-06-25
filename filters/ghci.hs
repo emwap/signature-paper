@@ -20,7 +20,7 @@ codeFromBlock (CodeBlock _ code) = code
 processCodeBlock :: (MonadInterpreter m) => Block -> m Block
 processCodeBlock (CodeBlock (lbl,cls,kvs) code) | "ghci" `elem` cls = do
   res <- eval code
-  return $ CodeBlock (lbl,cls,kvs) $ unlines $ ("ghci> " ++ code) : [res]
+  return $ CodeBlock (lbl,cls,kvs) res
 processCodeBlock (CodeBlock attr@(_,cls,_) _) | "hide" `elem` cls = return $ Div attr [Null]
 processCodeBlock b = return b
 
