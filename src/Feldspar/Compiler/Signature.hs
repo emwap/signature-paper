@@ -37,20 +37,20 @@ import Text.PrettyPrint.Mainland
 
 -- * Combinators
 
-lam :: (VarPred Data a)
+lam :: (Type a)
     => (Data a -> Signature b) -> Signature (a -> b)
 lam f = Lam Empty $ \x -> f x
 
-name :: (VarPred Data a)
+name :: (Type a)
      => String -> (Data a -> Signature b) -> Signature (a -> b)
 name s f = Lam (Named s) $ \x -> f x
 
-ret,ptr :: (VarPred Data a)
+ret,ptr :: (Type a)
         => String -> Data a -> Signature a
 ret = Ret
 ptr = Ptr
 
-arg :: (VarPred Data a)
+arg :: (Type a)
     => Ann a -> (Data a -> Data b) -> (Data b -> Signature c) -> Signature (a -> c)
 arg s g f = Lam s $ \x -> f (g x)
 

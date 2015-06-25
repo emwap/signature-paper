@@ -130,16 +130,14 @@ The basic combinators `lam`, `res` and `ptr`, are used for argument positions an
 
 ``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
 -- | Capture an argument
-lam :: (VarPred Data a)
-    => (Data a -> Signature Data b) -> Signature Data (a -> b)
+lam :: (Type a) => (Data a -> Signature b) -> Signature (a -> b)
 
 -- | Capture and name an argument
-name :: (VarPred Data a)
-     => String -> (Data a -> Signature Data b) -> Signature Data (a -> b)
+name :: (Type a) => String -> (Data a -> Signature b) -> Signature (a -> b)
 
 -- | Create a named function return either by value or reference
-ret,ptr :: (VarPred Data a)
-        => String -> Data a -> Signature Data a
+ret :: (Type a) => String -> Data a -> Signature a
+ptr :: (Type a) => String -> Data a -> Signature a
 ```
 
 
@@ -196,17 +194,17 @@ By using two separate embeddings it is possible to have a small set of construct
 
 ``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
-data Ann exp a where
-  Empty  :: Ann exp a
-  Native :: VarPred exp a => Data F.Length -> Ann exp [a]
-  Named  :: String -> Ann exp a
+data Ann a where
+  Empty  :: Ann a
+  Native :: Type a => Data F.Length -> Ann [a]
+  Named  :: String -> Ann a
 
 -- | Annotation carrying signature description
-data Signature exp a where
-  Ret    :: (VarPred exp a) => String -> exp a -> Signature exp a
-  Ptr    :: (VarPred exp a) => String -> exp a -> Signature exp a
-  Lam    :: (VarPred exp a)
-         => Ann exp a -> (exp a -> Signature exp b) -> Signature exp (a -> b)
+data Signature a where
+  Ret    :: (Type a) => String -> Data a -> Signature a
+  Ptr    :: (Type a) => String -> Data a -> Signature a
+  Lam    :: (Type a)
+         => Ann a -> (Data a -> Signature b) -> Signature (a -> b)
 ```
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
@@ -222,7 +220,7 @@ The final paper will show in more detail how the signature is compiled into C co
 - Generialization of the Signature language is future work
 
 ``` {.haskell}
-sig :: Signature Data (F.WordN -> [Word32] -> [Word32] -> Word32)
+sig :: Signature (F.WordN -> [Word32] -> [Word32] -> Word32)
 sig = name "len" $ \len ->
       native len $ \as  ->
       native len $ \bs  ->
