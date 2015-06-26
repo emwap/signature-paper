@@ -96,9 +96,7 @@ cgenDefinition sig = ppr $ _globals $ snd $ runCGen (translateFunction sig) env
 -- * Compilation
 
 -- | Compile a @Signature@ to C code
-translateFunction :: forall m a
-                  .  (MonadC m)
-                  => Signature a -> m ()
+translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
 translateFunction sig = go sig (return ())
   where
     go :: forall d. Signature d -> m () -> m ()
@@ -128,7 +126,11 @@ translateFunction sig = go sig (return ())
       go (f w) $ do
         body
         len <- compExp l
-        addLocal [cdecl| struct array $id:m = { .length = $len, .buffer = $id:n }; |]
+        addLocal [cdecl| struct array $id:m = { .buffer = $id:n
+                                              , .length=$len
+                                              , .elemSize=sizeof($ty:t)
+                                              , .bytes=sizeof($ty:t)*$len
+                                              }; |]
         addParam [cparam| $ty:t * $id:n |]
     go fun@(Lam (Named s) f) body = do
       t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
@@ -143,4 +145,3 @@ translateFunction sig = go sig (return ())
 
     appendId :: C.Id -> String -> C.Id
     appendId (C.Id s loc) suf = C.Id (s++suf) loc
-
