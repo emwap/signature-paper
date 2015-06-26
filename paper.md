@@ -130,7 +130,16 @@ To address the problems above, this paper presents two contributions:
 # The Signature Language
 
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
+
 The Signature language allows the programmer to express the mapping of individual arguments separately.
+
+- typed language, type safety of Feldspar is preserved.
+- specify how the compiler should treat each argument, and result.
+    - naming arguments, especially for readability and debugging.
+    - control data representation from a performance perspective.
+    - potentially generate interface code to bridge different representation formats.
+    - the signature code does not become a wrapper around the original function, instead it is fused with the function body
+    - since the signature is added before optimization, it can possibly enable more optimizations.
 
 The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
 
@@ -219,6 +228,7 @@ The final paper will show in more detail how the signature is compiled into C co
 # Discussion and Future Work
 
 - Generialization of the Signature language is future work
+- It is currently not possible to stack multiple annotations on the same argument
 
 ``` {.haskell}
 sig = name "len" $ \len ->
