@@ -5,7 +5,7 @@ author:
   - Anders Persson
   - Emil Axelsson
 abstract: |
-  When compiling EDSLs into other languages, types in the source language must be translated into corresponding types in the target language.
+  When compiling EDSLs into other languages, the compiler translates types in the source language into corresponding types in the target language.
   The translation is often driven by a small set of rules that map a single type in the source language into a single type in the target language.
   However, this simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and performance in the generated code.
 
@@ -49,29 +49,31 @@ The purpose of Feldspar is to implement high-performance software, especially in
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.
 When translating a function signature, the compiler uses a specific calling convention as detailed in [@persson2014towards, ch. 1.4.2]:
 
+- All functions return `void`{.C}
 - Scalar values are passed by value
 - Structured values (structs, arrays) are passed by reference
 - Arrays are represented using a data structure `struct array`{.C}
-- All functions return `void`{.C}
 - Return values are passed through caller provided pointers
 
 For example, the following is the type of an FFT function in Feldspar:
 
-``` {.haskell .skip}
+``` {.haskell}
 fft :: Data [Double] -> Data [Double]
+```
+``` {.haskell .hide}
+fft = id
 ```
 The type constructor `Data` denotes a Feldspar expression, and its parameter denotes the type of value computed by that expression. For historical reasons, Feldspar uses `[]` to denote immutable arrays.
 
-When compiled, the `fft` is translated into the C99 signature
-
-``` {.C}
-void fft(struct array *, struct array * *);
+The compiler translates the `fft` function into the following C99 signature,
+``` {.ghci}
+cgenProto $ lam $ \xs -> ptr "fft" $ fft xs
 ```
 where `struct array`{.C} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
 
-The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
+The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. The convention ensures that all aruments fit into a register, which is helps avoid spilling arguments to the call stack. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
 
-However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will usually be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
+However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
 
 
 
@@ -145,7 +147,7 @@ ptr :: (Type a) => String -> Data a -> Signature a
 ```
 
 
-As a running example, we will reuse the `scProd`{.haskell} function from \cref{issues-with-fixed-mappings}.
+As our running example, we will reuse the `scProd`{.haskell} function from \cref{issues-with-fixed-mappings}.
 
 ``` {.haskell .skip}
 scProd :: Data [Double] -> Data [Double] -> Data Double
