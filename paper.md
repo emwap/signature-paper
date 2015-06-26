@@ -43,10 +43,13 @@ import Feldspar.Compiler.Signature
 - A fixed mapping is too restrictive
   -->
 
-Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].
+[^FeldsparLanguageHackage]: <https://hackage.haskell.org/package/feldspar-language>
+[^FeldsparCompilerHackage]: <https://hackage.haskell.org/package/feldspar-compiler>
+
+Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].[^FeldsparLanguageHackage]
 The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems [@persson2014towards].
 
-Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.
+Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.[^FeldsparCompilerHackage]
 When translating a function signature, the compiler uses a specific calling convention as detailed in [@persson2014towards, ch. 1.4.2]:
 
 - All functions return `void`{.C}
@@ -81,9 +84,9 @@ However, a hard-wired set of mapping rules can be restrictive and introduce perf
 
 With a fixed signature mapping it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrapper functions have to be written and maintained.
 
-In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for several arrays if they always have the same length? And so on.
+In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for more than one array if they always have the same length? And so on.
 
-Even if we allow flags to customize the compiler, it is clear that a fixed set of mapping rules will never be able to cover all possible situations. Instead, we would like to put the exported signature in the hands of the programmer.
+Even if we allow flags to customize the compiler, a fixed set of mapping rules will never be able to cover all possible situations. Instead, we would like to put the exported signature in the hands of the programmer.
 
   <!--
 Many compilers provide options to change the interpretation of program elements.
@@ -103,7 +106,7 @@ The generated signature with the default mapping is:
 ``` {.ghci}
 cgenProto $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
-(By default, the Feldspar compiler automatically makes up names for the arguments.)
+By default, the Feldspar compiler automatically makes up names for the arguments.
 Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
 
 ``` {.C}
@@ -135,7 +138,7 @@ The Signature language allows the programmer to express the mapping of individua
 
 - typed language, type safety of Feldspar is preserved.
 - specify how the compiler should treat each argument, and result.
-    - naming arguments, especially for readability and debugging.
+    - naming arguments, for readability and debugging.
     - control data representation from a performance perspective.
     - potentially generate interface code to bridge different representation formats.
     - the signature code does not become a wrapper around the original function, instead it is fused with the function body
@@ -221,7 +224,7 @@ The signature is compiled by recursively traversing the `Lam` constructors and b
 Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
 The compilation of the function body is delegated to the Feldspar compiler.
 
-The final paper will show in more detail how the signature is compiled into C code.
+\todo{The final paper will show in more detail how the signature is compiled into C code.}
 
 
 
@@ -229,6 +232,7 @@ The final paper will show in more detail how the signature is compiled into C co
 
 - Generialization of the Signature language is future work
 - It is currently not possible to stack multiple annotations on the same argument
+- Change the feldspar-compiler to use native arrays internally and make it possible to add other representations as signatures.
 
 ``` {.haskell}
 sig = name "len" $ \len ->
