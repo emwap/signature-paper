@@ -18,7 +18,7 @@ expr5 :: Data [F.Index] -> Data F.Index
 expr5 v = let l = F.getLength v
            in F.forLoop l l $ \i s -> s + v F.! i
 
-sig6_1, sig6_2 :: Signature Data (F.Word16 -> F.Word16 -> [F.Word8] -> F.Word16)
+sig6_1, sig6_2 :: Signature (F.Word16 -> F.Word16 -> [F.Word8] -> F.Word16)
 sig6_1 = lam $ \p -> lam $ \i -> lam $ \v -> ptr "crc" $ F.crcNaive p i $ F.sugar v
 
 sig6_2 = name "poly" $ \p ->
@@ -26,7 +26,7 @@ sig6_2 = name "poly" $ \p ->
          name "arr"  $ \v ->
          ret  "crc"  $ F.crcNaive p i $ F.sugar v
 
-sig6_3 :: Signature Data (F.Word16 -> F.Word16 -> F.Length -> [F.Word8] -> F.Word16)
+sig6_3 :: Signature (F.Word16 -> F.Word16 -> F.Length -> [F.Word8] -> F.Word16)
 sig6_3 = name "poly"   $ \p ->
          name "ini"    $ \i ->
          exposeLength  $ \v ->
@@ -38,19 +38,18 @@ crc :: F.Bits a
 --           $ \t -> F.crcNormal t i $ F.sugar v
 crc p i v = F.crcNaive p i $ F.sugar v
 
-sig7 :: Signature Data (F.Word16 -> [F.Word8] -> F.Word16)
+sig7 :: Signature (F.Word16 -> [F.Word8] -> F.Word16)
 sig7 = name "ini" $ \i ->
        name "vec" $ \v ->
        ret  "crc" $ crc 0x8005 i v
 
-sig8_1 :: Signature Data ([F.Word8] -> [F.Word8] -> F.Word8)
+sig8_1 :: Signature ([F.Word8] -> [F.Word8] -> F.Word8)
 sig8_1 = lam $ \as ->
          lam $ \bs ->
          ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
 
-sig8_2 :: Signature Data (F.Length -> [F.Word8] -> [F.Word8] -> F.Word8)
+sig8_2 :: Signature (F.Length -> [F.Word8] -> [F.Word8] -> F.Word8)
 sig8_2 = name "len" $ \len ->
          native len $ \as ->
          native len $ \bs ->
          ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
-
