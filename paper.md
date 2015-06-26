@@ -110,7 +110,7 @@ By default, the Feldspar compiler automatically makes up names for the arguments
 Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
 
 ``` {.C}
-void scProd(double * v0, double * v1, int length, double * out);
+void scProd(double* v0, double* v1, int length, double* out);
 ```
 \todo{We cannot really produce this with `native` since we need the length before it is captured}
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may very well expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
@@ -136,13 +136,15 @@ Dissatisfied with hard-wired rules and global compiler options, we propose a sma
 
 The Signature language allows the programmer to express the mapping of individual arguments separately.
 
-- typed language, type safety of Feldspar is preserved.
 - specify how the compiler should treat each argument, and result.
     - naming arguments, for readability and debugging.
     - control data representation from a performance perspective.
     - potentially generate interface code to bridge different representation formats.
     - the signature code does not become a wrapper around the original function, instead it is fused with the function body
     - since the signature is added before optimization, it can possibly enable more optimizations.
+
+Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
+The Signature language preserves the type safety of the Felspar language.
 
 The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
 
@@ -230,6 +232,10 @@ The compilation of the function body is delegated to the Feldspar compiler.
 
 # Discussion and Future Work
 
+- Why not just add annotations to the `Lam`{.haskell} constructor in Feldspar Core?
+    - Signatures can be seen as an extension to the Core language.
+    - Signatures can coexist with other similar extensions
+    - Signatures have the same power (for top-level lambdas) as the Core `Lam`{.haskell} constructor
 - Generialization of the Signature language is future work
 - It is currently not possible to stack multiple annotations on the same argument
 - Change the feldspar-compiler to use native arrays internally and make it possible to add other representations as signatures.
