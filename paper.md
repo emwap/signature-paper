@@ -238,9 +238,7 @@ compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
 
 The first function, `varExp`, is used to create a free variable in Feldspar. Naturally, this function is not exported to ordinary users. The function `compExp` is used to compile a Feldspar expression to a C expression `Exp`. Since compilation normally results in a number of C statements in addition to the expression, `compExp` returns in a monad `m` capable of collecting C statements that can later be pretty printed as C code. Finally, `compTypeF` is used to generate a C type from a type `a` constrained by Feldspar's `Type` class. The argument of type `proxy a` is just used to determine the type `a`.
 
-The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
-Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
-The compilation of the function body is delegated to the Feldspar compiler.
+The code generator is defined in \cref{lst:translate-sig}. Before explaining how it works, we will explain the code generation technique used.
 
 We use a C code generation monad for producing the C code. Operations of this monad are accessed via the `MonadC` type class. Among other things, it provides a method for generating fresh names, a methods for adding statements to the generated code and for adding parameters to the currently generated function definition.
 
@@ -248,7 +246,7 @@ The concrete pieces of C code to be generated are written as actual C code using
 
 [^language-c-quote]: <http://hackage.haskell.org/package/language-c-quote>
 
-... For example, consider the following two lines from \cref{lst:translate-sig}:
+For example, consider the following two lines from \cref{lst:translate-sig}:
 
 ``` {.haskell .skip}
 addParam [cparam| $ty:t *out |]
@@ -261,7 +259,10 @@ The first line adds a parameter to the generated C function, and the second line
 
 Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
 
-\todo{The final paper will show in more detail how the signature is compiled into C code.}
+The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
+\todo{Explain one or more cases in more detail.}
+Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
+The compilation of the function body is delegated to the Feldspar compiler.
 
 ``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=float}
 -- | Compile a @Signature@ to C code
