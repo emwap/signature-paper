@@ -228,7 +228,7 @@ We can think of `Signature` as adding top-level lambda abstraction and result an
 
 `Signature` is defined as a wrapper type around the Feldspar expression type `Data`. In order to generate code for signatures, we first need to be able to generate code for `Data`. To this end, the Feldspar compiler provides the following interface:
 
-``` {.haskell}
+``` {.haskell .skip}
 varExp    :: Type a             => VarId -> Data a
 compExp   :: (MonadC m)         => Data a -> m C.Exp
 compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
@@ -248,7 +248,7 @@ The concrete pieces of C code to be generated are written as actual C code using
 
 ... For example, consider the following two lines from \cref{lst:translate-sig}:
 
-``` {.haskell}
+``` {.haskell .skip}
 addParam [cparam| $ty:t *out |]
 addStm [cstm| *out = $e; |]
 ```
