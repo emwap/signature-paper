@@ -242,7 +242,7 @@ The compilation of the function body is delegated to the Feldspar compiler.
 
 We use a C code generation monad for producing the C code. Operations of this monad are accessed via the `MonadC` type class. Among other things, it provides a method for generating fresh names, a methods for adding statements to the generated code and for adding parameters to the currently generated function definition.
 
-The concrete pieces of C code to be generated are written as actual C code using a quasi-quoter\ [@mainland2007nice] for C code, provided byt the package `language-c-quote`[^language-c-quote].
+The concrete pieces of C code to be generated are written as actual C code using quasi-quoters\ [@mainland2007nice] for C code, provided by the package `language-c-quote`[^language-c-quote].
 
 [^language-c-quote]: <http://hackage.haskell.org/package/language-c-quote>
 
@@ -253,9 +253,9 @@ addParam [cparam| $ty:t *out |]
 addStm [cstm| *out = $e; |]
 ```
 
-The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, and the `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
+The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
 
-Quasi-quoters also allow splicing in Haskell value in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
+Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
 
 \todo{The final paper will show in more detail how the signature is compiled into C code.}
 
