@@ -228,7 +228,58 @@ The compilation of the function body is delegated to the Feldspar compiler.
 
 \todo{The final paper will show in more detail how the signature is compiled into C code.}
 
+``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=float}
+-- | Compile a @Signature@ to C code
+translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
+translateFunction sig = go sig (return ())
+  where
+    go :: forall d. Signature d -> m () -> m ()
+    go (Ret n a) prelude = do
+      t <- compType a
+      inFunctionTy t n $ do
+        prelude
+        e <- compExp a
+        addStm [cstm| return $e; |]
+    go (Ptr n a) prelude = do
+      t <- compType a
+      inFunction n $ do
+        prelude
+        e <- compExp a
+        addParam [cparam| $ty:t *out |]
+        addStm [cstm| *out = $e; |]
+    go fun@(Lam Empty f) prelude = do
+      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      v <- varExp <$> freshId
+      C.Var n _ <- compExp v
+      go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
+    go fun@(Lam n@(Native l) f) prelude = do
+      t <- compTypePP (Proxy :: Proxy Data) (elemProxy n fun)
+      w <- varExp <$> freshId
+      C.Var m _ <- compExp w
+      let n = appendId m "_buf"
+      go (f w) $ do
+        prelude
+        len <- compExp l
+        addLocal [cdecl| struct array $id:m = { .buffer = $id:n
+                                              , .length=$len
+                                              , .elemSize=sizeof($ty:t)
+                                              , .bytes=sizeof($ty:t)*$len
+                                              }; |]
+        addParam [cparam| $ty:t * $id:n |]
+    go fun@(Lam (Named s) f) prelude = do
+      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      i <- freshId
+      withAlias i s $ go (f $ varExp i) $ prelude >> addParam [cparam| $ty:t $id:s |]
 
+    argProxy :: Signature (b -> c) -> Proxy b
+    argProxy _ = Proxy
+
+    elemProxy :: Ann [b] -> Signature ([b] -> c) -> Proxy b
+    elemProxy _ _ = Proxy
+
+    appendId :: C.Id -> String -> C.Id
+    appendId (C.Id s loc) suf = C.Id (s++suf) loc
+```
 
 # Discussion and Future Work
 

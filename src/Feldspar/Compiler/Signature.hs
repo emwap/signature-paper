@@ -100,31 +100,31 @@ translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
 translateFunction sig = go sig (return ())
   where
     go :: forall d. Signature d -> m () -> m ()
-    go (Ret n a) body = do
+    go (Ret n a) prelude = do
       t <- compType a
       inFunctionTy t n $ do
-        body
+        prelude
         e <- compExp a
         addStm [cstm| return $e; |]
-    go (Ptr n a) body = do
+    go (Ptr n a) prelude = do
       t <- compType a
       inFunction n $ do
-        body
+        prelude
         e <- compExp a
         addParam [cparam| $ty:t *out |]
         addStm [cstm| *out = $e; |]
-    go fun@(Lam Empty f) body = do
+    go fun@(Lam Empty f) prelude = do
       t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
       v <- varExp <$> freshId
       C.Var n _ <- compExp v
-      go (f v) $ body >> addParam [cparam| $ty:t $id:n |]
-    go fun@(Lam n@(Native l) f) body = do
+      go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
+    go fun@(Lam n@(Native l) f) prelude = do
       t <- compTypePP (Proxy :: Proxy Data) (elemProxy n fun)
       w <- varExp <$> freshId
       C.Var m _ <- compExp w
       let n = appendId m "_buf"
       go (f w) $ do
-        body
+        prelude
         len <- compExp l
         addLocal [cdecl| struct array $id:m = { .buffer = $id:n
                                               , .length=$len
@@ -132,10 +132,10 @@ translateFunction sig = go sig (return ())
                                               , .bytes=sizeof($ty:t)*$len
                                               }; |]
         addParam [cparam| $ty:t * $id:n |]
-    go fun@(Lam (Named s) f) body = do
+    go fun@(Lam (Named s) f) prelude = do
       t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
       i <- freshId
-      withAlias i s $ go (f $ varExp i) $ body >> addParam [cparam| $ty:t $id:s |]
+      withAlias i s $ go (f $ varExp i) $ prelude >> addParam [cparam| $ty:t $id:s |]
 
     argProxy :: Signature (b -> c) -> Proxy b
     argProxy _ = Proxy
