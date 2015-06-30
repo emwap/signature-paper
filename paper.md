@@ -207,6 +207,8 @@ The deep embedding (\cref{lst:signature-deep}) is interpreted by the compiler to
 
 By using two separate embeddings it is possible to have a small set of constructs that the compiler has to deal with, while at the same time provide a rich set of combinators to the end user. This way of combining deep and shallow embeddings has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
 
+\todo{At this stage, it's not visible that the shallow embedding is richer than the deep embedding. Can we show that the shallow embedding can be extended? Otherwise I think we have to play down the deep/shallow aspect.}
+
 ``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
 data Ann a where
