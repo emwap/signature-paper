@@ -7,7 +7,7 @@ author:
 abstract: |
   When compiling EDSLs into other languages, the compiler translates types in the source language into corresponding types in the target language.
   The translation is often driven by a small set of rules that map a single type in the source language into a single type in the target language.
-  However, this simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and performance in the generated code.
+  This simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and performance in the generated code.
 
   Instead of hard-wiring a single set of translation rules into a compiler, this paper introduces a small language that lets the programmer describe the mapping of each argument and function separately.
 
@@ -74,9 +74,9 @@ cgenProto $ lam $ \xs -> ptr "fft" $ fft xs
 ```
 where `struct array`{.C} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
 
-The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. The convention ensures that all aruments fit into a register, which is helps avoid spilling arguments to the call stack. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
+The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. The convention ensures that all arguments fit into a register, which helps avoid spilling arguments to the call stack. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
 
-However, a hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
+A hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
 
 
 
@@ -113,7 +113,7 @@ Apart from the problem that Feldspar's `struct array` is an unconventional array
 void scProd(double* v0, double* v1, int length, double* out);
 ```
 \todo{We cannot really produce this with `native` since we need the length before it is captured}
-Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may very well expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
+Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
 
 In addition to being able to customize the calling convention, we might also want to affect non-functional aspects of functions.
 
@@ -135,6 +135,9 @@ To address the problems above, this paper presents two contributions:
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
 
 The Signature language allows the programmer to express the mapping of individual arguments separately.
+Specifically allows the programmer  to add annotations to every argument.
+These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
+Or, it can change the arity of the function by introducing new parameters, like the `exposeLength` combinator does.
 
 - specify how the compiler should treat each argument, and result.
     - naming arguments, for readability and debugging.
@@ -282,6 +285,8 @@ translateFunction sig = go sig (return ())
 ```
 
 # Discussion and Future Work
+
+Why is a new language needed?
 
 - Why not just add annotations to the `Lam`{.haskell} constructor in Feldspar Core?
     - Signatures can be seen as an extension to the Core language.
