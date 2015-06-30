@@ -225,6 +225,8 @@ data Signature a where
          => Ann a -> (Data a -> Signature b) -> Signature (a -> b)
 ```
 
+We can think of `Signature` as adding top-level lambda abstraction and result annotations to the existing expression language `Data`. The use of a host-language function in the `Lam` constructor is commonly known as *higher-order abstract syntax* (HOAS) [@pfenning1988higher]. HOAS allows us to construct signatures without the need to generate fresh variable names. As we will see soon, names are instead generated when we generate code from the signature.
+
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
 Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
 The compilation of the function body is delegated to the Feldspar compiler.
