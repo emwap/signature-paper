@@ -201,8 +201,6 @@ cgenProto ex3
 
 # Implementation
 
-\todo{Describe the C-monad and CompExp}
-
 The language is implemented as a combination of a shallow and a deep embedding.
 The shallow embedding (\cref{lst:signature-shallow}), which is also the programmer interface, provides combinators to describe the mapping of a function.
 The deep embedding (\cref{lst:signature-deep}) is interpreted by the compiler to apply the rules.
@@ -224,7 +222,19 @@ data Signature a where
          => Ann a -> (Data a -> Signature b) -> Signature (a -> b)
 ```
 
-We can think of `Signature` as adding top-level lambda abstraction and result annotations to the existing expression language `Data`. The use of a host-language function in the `Lam` constructor is commonly known as *higher-order abstract syntax* (HOAS) [@pfenning1988higher]. HOAS allows us to construct signatures without the need to generate fresh variable names. As we will see soon, names are instead generated when we generate code from the signature.
+We can think of `Signature` as adding top-level lambda abstraction and result annotations to the existing expression language `Data`. The use of a host-language function in the `Lam` constructor is commonly known as *higher-order abstract syntax* (HOAS) [@pfenning1988higher]. HOAS allows us to construct signatures without the need to generate fresh variable names. As we will see in section\ \cref{code-generation}, names are instead generated when we generate code from the signature.
+
+## Code generation
+
+`Signature` is defined as a wrapper type around the Feldspar expression type `Data`. In order to generate code for signatures, we first need to be able to generate code for `Data`. To this end, the Feldspar compiler provides the following interface:
+
+``` {.haskell}
+varExp    :: Type a             => VarId -> Data a
+compExp   :: (MonadC m)         => Data a -> m C.Exp
+compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
+```
+
+The first function, `varExp`, is used to create a free variable in Feldspar. Naturally, this function is not exported to ordinary users. The function `compExp` is used to compile a Feldspar expression to a C expression `Exp`. Since compilation normally results in a number of C statements in addition to the expression, `compExp` returns in a monad `m` capable of collecting C statements that can later be pretty printed as C code. Finally, `compTypeF` is used to generate a C type from a type `a` constrained by Feldspar's `Type` class. The argument of type `proxy a` is just used to determine the type `a`.
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
 Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
@@ -239,25 +249,25 @@ translateFunction sig = go sig (return ())
   where
     go :: forall d. Signature d -> m () -> m ()
     go (Ret n a) prelude = do
-      t <- compType a
+      t <- compTypeF a
       inFunctionTy t n $ do
         prelude
         e <- compExp a
         addStm [cstm| return $e; |]
     go (Ptr n a) prelude = do
-      t <- compType a
+      t <- compTypeF a
       inFunction n $ do
         prelude
         e <- compExp a
         addParam [cparam| $ty:t *out |]
         addStm [cstm| *out = $e; |]
     go fun@(Lam Empty f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      t <- compTypeF (argProxy fun)
       v <- varExp <$> freshId
       C.Var n _ <- compExp v
       go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
     go fun@(Lam n@(Native l) f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (elemProxy n fun)
+      t <- compTypeF (elemProxy n fun)
       w <- varExp <$> freshId
       C.Var m _ <- compExp w
       let n = appendId m "_buf"
@@ -271,7 +281,7 @@ translateFunction sig = go sig (return ())
                                               }; |]
         addParam [cparam| $ty:t * $id:n |]
     go fun@(Lam (Named s) f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      t <- compTypeF (argProxy fun)
       i <- freshId
       withAlias i s $ go (f $ varExp i) $ prelude >> addParam [cparam| $ty:t $id:s |]
 

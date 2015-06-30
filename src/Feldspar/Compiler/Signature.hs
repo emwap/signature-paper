@@ -35,6 +35,9 @@ import Text.PrettyPrint.Mainland
 
 -- TODO move Signature and translateFunction to feldspar-compiler-shim
 
+compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
+compTypeF = compTypePP (Proxy :: Proxy Data)
+
 -- * Combinators
 
 lam :: (Type a)
@@ -101,25 +104,25 @@ translateFunction sig = go sig (return ())
   where
     go :: forall d. Signature d -> m () -> m ()
     go (Ret n a) prelude = do
-      t <- compType a
+      t <- compTypeF a
       inFunctionTy t n $ do
         prelude
         e <- compExp a
         addStm [cstm| return $e; |]
     go (Ptr n a) prelude = do
-      t <- compType a
+      t <- compTypeF a
       inFunction n $ do
         prelude
         e <- compExp a
         addParam [cparam| $ty:t *out |]
         addStm [cstm| *out = $e; |]
     go fun@(Lam Empty f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      t <- compTypeF (argProxy fun)
       v <- varExp <$> freshId
       C.Var n _ <- compExp v
       go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
     go fun@(Lam n@(Native l) f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (elemProxy n fun)
+      t <- compTypeF (elemProxy n fun)
       w <- varExp <$> freshId
       C.Var m _ <- compExp w
       let n = appendId m "_buf"
@@ -133,7 +136,7 @@ translateFunction sig = go sig (return ())
                                               }; |]
         addParam [cparam| $ty:t * $id:n |]
     go fun@(Lam (Named s) f) prelude = do
-      t <- compTypePP (Proxy :: Proxy Data) (argProxy fun)
+      t <- compTypeF (argProxy fun)
       i <- freshId
       withAlias i s $ go (f $ varExp i) $ prelude >> addParam [cparam| $ty:t $id:s |]
 
