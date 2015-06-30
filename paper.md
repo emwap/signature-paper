@@ -199,6 +199,21 @@ cgenProto ex3
 ```
 
 
+
+``` {.haskell}
+sig = name "len" $ \len ->
+      native len $ \as  ->
+      native len $ \bs  ->
+      ret "scProd" $ scProd as bs
+```
+
+``` {.ghci}
+cgenDefinition sig
+```
+
+
+
+
 # Implementation
 
 The language is implemented as a combination of a shallow and a deep embedding.
@@ -329,16 +344,7 @@ Why is a new language needed?
 - It is currently not possible to stack multiple annotations on the same argument
 - Change the feldspar-compiler to use native arrays internally and make it possible to add other representations as signatures.
 
-``` {.haskell}
-sig = name "len" $ \len ->
-      native len $ \as  ->
-      native len $ \bs  ->
-      ret "scProd" $ scProd as bs
-```
 
-``` {.ghci}
-cgenDefinition sig
-```
 
 # Related Work
 
