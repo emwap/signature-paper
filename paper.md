@@ -253,6 +253,8 @@ addParam [cparam| $ty:t *out |]
 addStm [cstm| *out = $e; |]
 ```
 
+\todo{line numbers should start from 17}
+
 The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
 
 Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
