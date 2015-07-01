@@ -136,19 +136,16 @@ To address the problems above, this paper presents two contributions:
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
 
 The Signature language allows the programmer to express the mapping of individual arguments separately.
-Specifically allows the programmer  to add annotations to every argument.
+Specifically it allows the programmer to add annotations to every argument.
 These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
 Or, it can change the arity of the function by introducing new parameters, like the `exposeLength` combinator does.
+
+Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
+The Signature language preserves the type safety of the Felspar language.
 
 - specify how the compiler should treat each argument, and result.
     - naming arguments, for readability and debugging.
     - control data representation from a performance perspective.
-    - potentially generate interface code to bridge different representation formats.
-    - the signature code does not become a wrapper around the original function, instead it is fused with the function body
-    - since the signature is added before optimization, it can possibly enable more optimizations.
-
-Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
-The Signature language preserves the type safety of the Felspar language.
 
 The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
 
@@ -200,16 +197,57 @@ cgenProto ex3
 ```
 
 
+The basic constructors in the language are useful for simple annotations on the arugments.
+But it is also possible to create constructors that will change the arity or introduce interface code into the embedded function.
+The interface code can bridge different representation formats.
 
-``` {.haskell}
-sig = name "len" $ \len ->
-      native len $ \as  ->
-      native len $ \bs  ->
-      ret "scProd" $ scProd as bs
-```
+Without the `Signature` language, we would have to write a C wrapper around the generated function.
+A wrapper is typically not parametric and has to change together with the generate code.
+Thus it becomes a maintenece burden.
+Also, the wrapper code is a separate function and can not be optimized together with the generated code.
+
+The `Signature` language combinators are applied before optimization and code generation and the wrapper code fuses with the function.
+
+For example, let's consider the `scProd`{.haskell} function again.
+In earlier versions it suffered from two problems.
+
+1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length. (see line 5 below)
+2. The arrays are passed using `struct array`{.C} pointer which results in extra dereferencing. (line 9 below)
 
 ``` {.ghci}
-cgenDefinition sig
+cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
+```
+
+To help alleviate these problems we can define smart constructors that modify the code before optimization.
+Note that these smart constructors are extensions to the `Signature` language and can be expressed by the end user.
+
+``` {.haskell .skip}
+-- | Pass the argument as a native array of length @len@
+native :: (Type a)
+       => Data Length -> (Data [a] -> Signature b) -> Signature ([a] -> b)
+native l f = Lam (Native l) $ \a -> f $ F.setLength l a
+
+-- | Expose the length of an array
+exposeLength :: (Type a)
+             => (Data [a] -> Signature b) -> Signature (F.Length -> [a] -> b)
+exposeLength f = name "len" $ \l -> native l f
+```
+
+The `native`{.haskell} constructor changes the array type to a native C array with a fixed length `l`.
+By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments.
+In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array` formats.
+
+With our new combinators we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length.
+
+``` {.haskell}
+scProdNative = name "len" $ \len ->
+               native len $ \as  ->
+               native len $ \bs  ->
+               ret "scProd" $ scProd as bs
+```
+Which compiles to:
+``` {.ghci}
+cgenDefinition scProdNative
 ```
 
 
