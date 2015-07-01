@@ -143,8 +143,6 @@ Or, it can change the arity of the function by introducing new parameters, like 
 Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
 The Signature language preserves the type safety of the Felspar language.
 
-\todo{Do something about these points.}
-
 The Signature language interface is given in \cref{lst:signature-shallow}.
 The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `ret` and `ptr` are used to return the result of the function to be generated.
 
@@ -201,7 +199,6 @@ But it is also possible to create constructors that will change the arity or int
 The interface code can bridge different representation formats.
 
 Without the `Signature` language, we would have to write a C wrapper around the generated function.
-\todo{Clarify what you mean by "parametric" and "change together with the generated code".}
 A wrapper written in C is not polymorphic, but declared with concrete types, like `int` or `double`.
 In contrast, the Feldspar functions are often polymorphic and the concrete types are decided at compile time.
 A handwritten wrapper would have to change for different concrete types, and thus becomes a maintenence burden.
@@ -315,7 +312,6 @@ The first line adds a parameter to the generated C function, and the second line
 Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
-\todo{Explain one or more cases in more detail.}
 Finally, the `Ret` node is compiled and combined with the arguments to produce the function signature.
 The compilation of the function body is delegated to the Feldspar compiler.
 
