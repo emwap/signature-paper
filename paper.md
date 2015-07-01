@@ -136,16 +136,12 @@ To address the problems above, this paper presents two contributions:
 Dissatisfied with hard-wired rules and global compiler options, we propose a small language as a more flexible way to drive the compiler.
 
 The Signature language allows the programmer to express the mapping of individual arguments separately.
-Specifically it allows the programmer to add annotations to every argument.
+Specifically it allows the programmer to add annotations to every argument and control the data representation.
 These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
 Or, it can change the arity of the function by introducing new parameters, like the `exposeLength` combinator does.
 
 Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
 The Signature language preserves the type safety of the Felspar language.
-
-- specify how the compiler should treat each argument, and result.
-    - naming arguments, for readability and debugging.
-    - control data representation from a performance perspective.
 
 \todo{Do something about these points.}
 
