@@ -180,7 +180,7 @@ which generates the following C signature when compiled
 cgenProto ex1
 ```
 
-We change the embedding to name the first argument
+Using `name` instead of `lam`, we change the embedding to name the first argument
 ``` {.haskell}
 ex2 = name "xs" $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
@@ -189,7 +189,7 @@ resulting in
 cgenProto ex2
 ```
 
-Finally, we change the function to return by value
+Finally, we change the function to return by value, by using `ret` instead of `ptr`
 ``` {.haskell}
 ex3 = name "xs" $ \xs -> name "ys" $ \ys -> ret "scProd" (scProd xs ys)
 ```
