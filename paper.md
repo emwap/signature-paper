@@ -109,10 +109,9 @@ cgenProto $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 By default, the Feldspar compiler automatically makes up names for the arguments.
 Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
 
-``` {.C}
-void scProd(double* v0, double* v1, int length, double* out);
+``` {.ghci}
+cgenProto $ name "len" $ \len -> native len $ \as -> native len $ \bs -> ret "scProd" $ scProd as bs
 ```
-\todo{We cannot really produce this with `native` since we need the length before it is captured}
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
 
 In addition to being able to customize the calling convention, we might also want to affect non-functional aspects of functions.
