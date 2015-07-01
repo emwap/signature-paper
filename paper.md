@@ -208,9 +208,7 @@ Without the `Signature` language, we would have to write a C wrapper around the 
 \todo{Clarify what you mean by "parametric" and "change together with the generated code".}
 A wrapper is typically not parametric and has to change together with the generate code.
 Thus it becomes a maintenece burden.
-Also, the wrapper code is a separate function and can not be optimized together with the generated code.
-
-The `Signature` language combinators are applied before optimization and code generation and the wrapper code fuses with the function.
+Also, the wrapper code is a separate function and can not be optimized together with the generated code. In contrast, the `Signature` language combinators are applied before optimization and code generation, and the wrapper code fuses with the function.
 
 For example, let's consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
