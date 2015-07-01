@@ -118,7 +118,7 @@ In addition to being able to customize the calling convention, we might also wan
 For example, we can name arguments for readability and debugging purposes.
 This is helpful since Feldspar is an embedded language and that syntactic information is lost when the Haskell compiler reads the source file.
 
-In future work we want to extend the annotations to include attributes to help the C compiler, including `restrict`{.C} and `volatile{.C}`.
+In future work we want to extend the annotations to include attributes to help the C compiler, including `restrict`{.C} and `volatile`{.C}.
 
 
 
