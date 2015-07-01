@@ -312,8 +312,8 @@ The first line adds a parameter to the generated C function, and the second line
 Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
-Finally, the `Ret` node is compiled and combined with the arguments to produce the function signature.
-The compilation of the function body is delegated to the Feldspar compiler.
+Finally, the `Ret` or `Ptr` case combines the arguments to produce the function signature.
+The compilation of the function body is delegated to the Feldspar compiler (by calling `compExp`).
 
 The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an example of how the `Signature` language can generate interface code.
 ``` {.haskell .skip firstnumber=24}
