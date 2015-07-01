@@ -115,8 +115,10 @@ cgenProto $ name "len" $ \len -> native len $ \as -> native len $ \bs -> ret "sc
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
 
 In addition to being able to customize the calling convention, we might also want to affect non-functional aspects of functions.
+For example, we can name arguments for readability and debugging purposes.
+This is helpful since Feldspar is an embedded language and that syntactic information is lost when the Haskell compiler reads the source file.
 
-\todo{Variable names, annotations: `inline`, `UNPACK`, `restrict`, `volatile`, etc.}
+In future work we want to extend the annotations to include attributes to help the C compiler, including `restrict`{.C} and `volatile{.C}`.
 
 
 
