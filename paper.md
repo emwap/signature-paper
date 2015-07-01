@@ -235,7 +235,7 @@ exposeLength :: (Type a)
 exposeLength f = name "len" $ \l -> native l f
 ```
 
-The `native`{.haskell} constructor changes the array type to a native C array with a fixed length `l`.
+The `native`{.haskell} constructor changes the array type to a native C array with length `l`.
 By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments.
 In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array` formats.
 
