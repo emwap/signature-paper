@@ -205,6 +205,7 @@ But it is also possible to create constructors that will change the arity or int
 The interface code can bridge different representation formats.
 
 Without the `Signature` language, we would have to write a C wrapper around the generated function.
+\todo{Clarify what you mean by "parametric" and "change together with the generated code".}
 A wrapper is typically not parametric and has to change together with the generate code.
 Thus it becomes a maintenece burden.
 Also, the wrapper code is a separate function and can not be optimized together with the generated code.
