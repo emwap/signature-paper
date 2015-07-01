@@ -147,7 +147,8 @@ The Signature language preserves the type safety of the Felspar language.
     - naming arguments, for readability and debugging.
     - control data representation from a performance perspective.
 
-The basic combinators `lam`, `res` and `ptr`, are used for argument positions and the result respectively.
+The Signature language interface is given in \cref{lst:signature-shallow}.
+The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `res` and `ptr` are used to return the result of the function to be generated.
 
 ``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
 -- | Capture an argument
