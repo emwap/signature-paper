@@ -123,10 +123,11 @@ translateFunction sig = go sig (return ())
       go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
     go fun@(Lam n@(Native l) f) prelude = do
       t <- compTypeF (elemProxy n fun)
-      w <- varExp <$> freshId
-      C.Var m _ <- compExp w
-      let n = appendId m "_buf"
-      go (f w) $ do
+      i <- freshId
+      let w = varExp i
+      C.Var (C.Id m _) _ <- compExp w
+      let n = m ++ "_buf"
+      withAlias i ('&':m) $ go (f w) $ do
         prelude
         len <- compExp l
         addLocal [cdecl| struct array $id:m = { .buffer = $id:n
@@ -145,6 +146,3 @@ translateFunction sig = go sig (return ())
 
     elemProxy :: Ann [b] -> Signature ([b] -> c) -> Proxy b
     elemProxy _ _ = Proxy
-
-    appendId :: C.Id -> String -> C.Id
-    appendId (C.Id s loc) suf = C.Id (s++suf) loc

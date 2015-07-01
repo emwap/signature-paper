@@ -323,6 +323,27 @@ The signature is compiled by recursively traversing the `Lam` constructors and b
 Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
 The compilation of the function body is delegated to the Feldspar compiler.
 
+The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an example of how the `Signature` language can generate interface code.
+``` {.haskell .skip firstnumber=24}
+    go fun@(Lam n@(Native l) f) prelude = do
+      t <- compTypeF (elemProxy n fun)
+      i <- freshId
+      let w = varExp i
+      C.Var (C.Id m _) _ <- compExp w
+      let n = m ++ "_buf"
+      withAlias i ('&':m) $ go (f w) $ do
+        prelude
+        len <- compExp l
+        addLocal [cdecl| struct array $id:m = { .buffer = $id:n
+                                              , .length=$len
+                                              , .elemSize=sizeof($ty:t)
+                                              , .bytes=sizeof($ty:t)*$len
+                                              }; |]
+        addParam [cparam| $ty:t * $id:n |]
+```
+Apart from allocating a fresh parameter, it creates a local `struct array`{.C} object (lines 33--37) on the function stack and initializes it with the length `l` and the buffer parameter.
+Then compilation continues with `f` applied to the address of the local `struct array`{.C} object.
+
 ``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=float}
 -- | Compile a @Signature@ to C code
 translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
@@ -349,10 +370,11 @@ translateFunction sig = go sig (return ())
       go (f v) $ prelude >> addParam [cparam| $ty:t $id:n |]
     go fun@(Lam n@(Native l) f) prelude = do
       t <- compTypeF (elemProxy n fun)
-      w <- varExp <$> freshId
-      C.Var m _ <- compExp w
-      let n = appendId m "_buf"
-      go (f w) $ do
+      i <- freshId
+      let w = varExp i
+      C.Var (C.Id m _) _ <- compExp w
+      let n = m ++ "_buf"
+      withAlias i ('&':m) $ go (f w) $ do
         prelude
         len <- compExp l
         addLocal [cdecl| struct array $id:m = { .buffer = $id:n
@@ -371,9 +393,6 @@ translateFunction sig = go sig (return ())
 
     elemProxy :: Ann [b] -> Signature ([b] -> c) -> Proxy b
     elemProxy _ _ = Proxy
-
-    appendId :: C.Id -> String -> C.Id
-    appendId (C.Id s loc) suf = C.Id (s++suf) loc
 ```
 
 # Discussion and Future Work
