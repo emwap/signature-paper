@@ -146,7 +146,7 @@ The Signature language preserves the type safety of the Felspar language.
 \todo{Do something about these points.}
 
 The Signature language interface is given in \cref{lst:signature-shallow}.
-The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `res` and `ptr` are used to return the result of the function to be generated.
+The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `ret` and `ptr` are used to return the result of the function to be generated.
 
 ``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
 -- | Capture an argument
@@ -316,7 +316,7 @@ Quasi-quoters also allow splicing in Haskell values in the quoted code. In the a
 
 The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
 \todo{Explain one or more cases in more detail.}
-Finally, the `Res` node is compiled and combined with the arguments to produce the function signature.
+Finally, the `Ret` node is compiled and combined with the arguments to produce the function signature.
 The compilation of the function body is delegated to the Feldspar compiler.
 
 The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an example of how the `Signature` language can generate interface code.
