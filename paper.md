@@ -254,6 +254,10 @@ Which compiles to:
 cgenDefinition scProdNative
 ```
 
+Note how the Feldspar compiler now realizes that both vectors have the same length, and thus removes the defensive minimum length calculation.
+
+The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.C} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays are used throughout the generated code, when stated so in the signature."
+
 
 
 
