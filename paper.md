@@ -239,7 +239,7 @@ The `native`{.haskell} function changes the array type to a native C array with 
 By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments.
 In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array` formats.
 
-
+The `exposeLength`{.haskell} function adds an extra length argument to the signature and passes this length to `native`. The effect is to break up a standard array argument into two arguments: a length and a native array.
 
 With our new combinators we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length.
 
