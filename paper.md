@@ -213,8 +213,8 @@ Also, the wrapper code is a separate function and can not be optimized together 
 For example, consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
 
-1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length. (see line 5 below)
-2. The arrays are passed using `struct array`{.C} pointer which results in extra dereferencing. (line 9 below)
+1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 5 below).
+2. The arrays are passed using `struct array`{.C} pointer which results in extra dereferencing (line 9 below).
 
 ``` {.ghci}
 cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
