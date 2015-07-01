@@ -210,7 +210,7 @@ A wrapper is typically not parametric and has to change together with the genera
 Thus it becomes a maintenece burden.
 Also, the wrapper code is a separate function and can not be optimized together with the generated code. In contrast, the `Signature` language combinators are applied before optimization and code generation, and the wrapper code fuses with the function.
 
-For example, let's consider the `scProd`{.haskell} function again.
+For example, consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
 
 1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length. (see line 5 below)
