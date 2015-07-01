@@ -206,8 +206,9 @@ The interface code can bridge different representation formats.
 
 Without the `Signature` language, we would have to write a C wrapper around the generated function.
 \todo{Clarify what you mean by "parametric" and "change together with the generated code".}
-A wrapper is typically not parametric and has to change together with the generate code.
-Thus it becomes a maintenece burden.
+A wrapper written in C is not polymorphic, but declared with concrete types, like `int` or `double`.
+In contrast, the Feldspar functions are often polymorphic and the concrete types are decided at compile time.
+A handwritten wrapper would have to change for different concrete types, and thus becomes a maintenence burden.
 Also, the wrapper code is a separate function and can not be optimized together with the generated code. In contrast, the `Signature` language combinators are applied before optimization and code generation, and the wrapper code fuses with the function.
 
 For example, consider the `scProd`{.haskell} function again.
