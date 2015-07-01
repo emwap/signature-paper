@@ -302,12 +302,10 @@ The concrete pieces of C code to be generated are written as actual C code using
 
 For example, consider the following two lines from \cref{lst:translate-sig}:
 
-``` {.haskell .skip}
+``` {.haskell .skip firstnumber=17}
 addParam [cparam| $ty:t *out |]
 addStm [cstm| *out = $e; |]
 ```
-
-\todo{line numbers should start from 17}
 
 The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
 
