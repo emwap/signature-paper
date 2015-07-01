@@ -147,6 +147,8 @@ The Signature language preserves the type safety of the Felspar language.
     - naming arguments, for readability and debugging.
     - control data representation from a performance perspective.
 
+\todo{Do something about these points.}
+
 The Signature language interface is given in \cref{lst:signature-shallow}.
 The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `res` and `ptr` are used to return the result of the function to be generated.
 
