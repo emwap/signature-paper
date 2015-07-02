@@ -194,14 +194,14 @@ cgenProto ex3
 ```
 
 
-The basic constructors in the language are useful for simple annotations on the arugments.
+The basic constructors in the language are useful for simple annotations on the arguments.
 But it is also possible to create constructors that will change the arity or introduce interface code into the embedded function.
 The interface code can bridge different representation formats.
 
 Without the `Signature` language, we would have to write a C wrapper around the generated function.
 A wrapper written in C is not polymorphic, but declared with concrete types, like `int` or `double`.
 In contrast, the Feldspar functions are often polymorphic and the concrete types are decided at compile time.
-A handwritten wrapper would have to change for different concrete types, and thus becomes a maintenence burden.
+A handwritten wrapper would have to change for different concrete types, and thus becomes a maintenance burden.
 Also, the wrapper code is a separate function and can not be optimized together with the generated code. In contrast, the `Signature` language combinators are applied before optimization and code generation, and the wrapper code fuses with the function.
 
 For example, consider the `scProd`{.haskell} function again.
@@ -389,15 +389,17 @@ translateFunction sig = go sig (return ())
 
 # Discussion and Future Work
 
-Why is a new language needed?
+The `Signature` language enables us to customize the signature of compiled Feldspar functions.
+It also allows generation of interface code fused with the original function.
 
-- Why not just add annotations to the `Lam`{.haskell} constructor in Feldspar Core?
-    - Signatures can be seen as an extension to the Core language.
-    - Signatures can coexist with other similar extensions
-    - Signatures have the same power (for top-level lambdas) as the Core `Lam`{.haskell} constructor
-- Generialization of the Signature language is future work
-- It is currently not possible to stack multiple annotations on the same argument
-- Change the feldspar-compiler to use native arrays internally and make it possible to add other representations as signatures.
+Why is a new language needed?
+Why not just add annotations to the `Lam`{.haskell} abstraction constructor in the Feldspar Core language?
+
+The `Signature` language is a proper extension of the Feldspar Core language, which it means it is optional and can co-exist with other extensions.
+Since the `Signature` is built using the deep/shallow technique, the language is possible to extend by the end user.
+Also, the `Signature` language can be seen as a replacement for the Core `Lam`{.haskell} constructor.
+
+In future work, we will generalize the `Signature` language to work with any expression language that supports the `CompExp` interface.
 
 
 
