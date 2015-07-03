@@ -207,7 +207,7 @@ Also, the wrapper code is a separate function and can not be optimized together 
 For example, consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
 
-1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 5 below).
+1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 6 below).
 2. The arrays are passed using a `struct array`{.C} pointer which results in extra dereferencing (line 9 below).
 
 ``` {.ghci}
@@ -411,10 +411,10 @@ Why is a new language needed?
 Why not just add annotations to the `Lam`{.haskell} abstraction constructor in the Feldspar Core language?
 
 The `Signature` language is a proper extension of the Feldspar Core language, which it means it is optional and can co-exist with other extensions.
-Since the `Signature` is built using the deep/shallow technique, the language is possible to extend by the end user.
-Also, the `Signature` language can be seen as a replacement for the Core `Lam`{.haskell} constructor.
+Since the `Signature` is built using a combination of deep and shallow embedding, the language is possible to extend by the end user.
+Also, the `Signature` language can be seen as a replacement for the top-level lambda abstractions in the Feldspar expression.
 
-In future work, we will generalize the `Signature` language to work with any expression language that supports the `CompExp` interface.
+In future work, we will generalize the `Signature` language to work with any expression language that supports the same interface (see \cref{code-generation}) as the Feldspar compiler.
 
 
 
