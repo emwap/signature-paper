@@ -5,7 +5,7 @@ author:
   - Anders Persson
   - Emil Axelsson
 abstract: |
-  When compiling EDSLs into other languages, the compiler translates types in the source language into corresponding types in the target language.
+  When compiling Embedded Domain Specific Languages (EDSLs) into other languages, the compiler translates types in the source language into corresponding types in the target language.
   The translation is often driven by a small set of rules that map a single type in the source language into a single type in the target language.
   This simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and performance in the generated code.
 
@@ -47,10 +47,10 @@ import Feldspar.Compiler.Signature
 [^FeldsparCompilerHackage]: <https://hackage.haskell.org/package/feldspar-compiler>
 
 Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].[^FeldsparLanguageHackage]
-The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems [@persson2014towards].
+The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems , see reference [@persson2014towards].
 
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.[^FeldsparCompilerHackage]
-When translating a function signature, the compiler uses a specific calling convention as detailed in [@persson2014towards, ch. 1.4.2]:
+When translating a function signature, the compiler uses a specific calling convention as detailed in chapter 1.4.2 in reference [@persson2014towards]:
 
 - All functions return `void`{.C}
 - Scalar values are passed by value
@@ -82,7 +82,7 @@ A hard-wired set of mapping rules can be restrictive and introduce performance p
 
 ## Issues with Fixed Mappings
 
-With a fixed signature mapping it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrapper functions have to be written and maintained.
+With a fixed signature mapping, it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrapper functions have to be written and maintained.
 
 In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for more than one array if they always have the same length? And so on.
 
@@ -138,7 +138,7 @@ Dissatisfied with hard-wired rules and global compiler options, we propose a sma
 The Signature language allows the programmer to express the mapping of individual arguments separately.
 Specifically it allows the programmer to add annotations to every argument and control the data representation.
 These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
-Or, it can change the arity of the function by introducing new parameters, like the `exposeLength` combinator does.
+Or, it can change the arity of the function by introducing new parameters, like the `native` and `exposeLength` combinators, which we will show later in this chapter.
 
 Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
 The Signature language preserves the type safety of the Felspar language.
@@ -235,7 +235,7 @@ In \cref{implementation} we show how the `Native` constructor produces the inter
 
 The `exposeLength`{.haskell} function adds an extra length argument to the signature and passes this length to `native`. The effect is to break up a standard array argument into two arguments: a length and a native array.
 
-With our new combinators we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length.
+With our new combinators, we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length.
 
 ``` {.haskell}
 scProdNative = name "len" $ \len ->
@@ -243,14 +243,14 @@ scProdNative = name "len" $ \len ->
                native len $ \bs  ->
                ret "scProd" $ scProd as bs
 ```
-Which compiles to:
+which compiles to:
 ``` {.ghci}
 cgenDefinition scProdNative
 ```
 
 Note how the Feldspar compiler now realizes that both vectors have the same length, and thus removes the defensive minimum length calculation.
 
-The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.C} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays are used throughout the generated code, when stated so in the signature."
+The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.C} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays throughout the generated code, when stated so in the signature, but that requires a change to the Feldspar compiler and is out of scope for this paper.
 
 
 
@@ -292,51 +292,7 @@ compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
 
 The first function, `varExp`, is used to create a free variable in Feldspar. Naturally, this function is not exported to ordinary users. The function `compExp` is used to compile a Feldspar expression to a C expression `Exp`. Since compilation normally results in a number of C statements in addition to the expression, `compExp` returns in a monad `m` capable of collecting C statements that can later be pretty printed as C code. Finally, `compTypeF` is used to generate a C type from a type `a` constrained by Feldspar's `Type` class. The argument of type `proxy a` is just used to determine the type `a`.
 
-The code generator is defined in \cref{lst:translate-sig}. Before explaining how it works, we will explain the code generation technique used.
-
-We use a C code generation monad for producing the C code. Operations of this monad are accessed via the `MonadC` type class. Among other things, it provides a method for generating fresh names, a methods for adding statements to the generated code and for adding parameters to the currently generated function definition.
-
-The concrete pieces of C code to be generated are written as actual C code using quasi-quoters\ [@mainland2007nice] for C code, provided by the package `language-c-quote`[^language-c-quote].
-
-[^language-c-quote]: <http://hackage.haskell.org/package/language-c-quote>
-
-For example, consider the following two lines from \cref{lst:translate-sig}:
-
-``` {.haskell .skip firstnumber=17}
-addParam [cparam| $ty:t *out |]
-addStm [cstm| *out = $e; |]
-```
-
-The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
-
-Quasi-quoters also allow splicing in Haskell values in the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
-
-The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
-Finally, the `Ret` or `Ptr` case combines the arguments to produce the function signature.
-The compilation of the function body is delegated to the Feldspar compiler (by calling `compExp`).
-
-The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an example of how the `Signature` language can generate interface code.
-``` {.haskell .skip firstnumber=24}
-    go fun@(Lam n@(Native l) f) prelude = do
-      t <- compTypeF (elemProxy n fun)
-      i <- freshId
-      let w = varExp i
-      C.Var (C.Id m _) _ <- compExp w
-      let n = m ++ "_buf"
-      withAlias i ('&':m) $ go (f w) $ do
-        prelude
-        len <- compExp l
-        addLocal [cdecl| struct array $id:m = { .buffer = $id:n
-                                              , .length=$len
-                                              , .elemSize=sizeof($ty:t)
-                                              , .bytes=sizeof($ty:t)*$len
-                                              }; |]
-        addParam [cparam| $ty:t * $id:n |]
-```
-Apart from allocating a fresh parameter, it creates a local `struct array`{.C} object (lines 33--37) on the function stack and initializes it with the length `l` and the buffer parameter.
-Then compilation continues with `f` applied to the address of the local `struct array`{.C} object.
-
-``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=float}
+``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=floathere}
 -- | Compile a @Signature@ to C code
 translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
 translateFunction sig = go sig (return ())
@@ -387,6 +343,65 @@ translateFunction sig = go sig (return ())
     elemProxy _ _ = Proxy
 ```
 
+\pagebreak
+
+The code generator is defined in \cref{lst:translate-sig}. Before explaining how it works, we will explain the code generation technique used.
+
+We use a C code generation monad for producing the C code. Operations of this monad are accessed via the `MonadC` type class. Among other things, it provides a method for generating fresh names, methods for adding statements to the generated code and for adding parameters to the currently generated function definition.
+
+The concrete pieces of C code to be generated are written as actual C code using quasi-quoters\ [@mainland2007nice] for C code, provided by the package `language-c-quote`[^language-c-quote].
+
+[^language-c-quote]: <http://hackage.haskell.org/package/language-c-quote>
+
+For example, consider the following two lines from \cref{lst:translate-sig}:
+
+``` {.haskell .skip firstnumber=17}
+addParam [cparam| $ty:t *out |]
+addStm [cstm| *out = $e; |]
+```
+
+The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.
+
+Quasi-quoters also allow the splicing of Haskell values into the quoted code. In the above example, `$ty:t` splices in the Haskell value `t` as a C type, and `$e` splices in `e` as a C expression. For the code to type check, `t` must have the type `C.Type` and `e` must have the type `C.Exp`.
+
+The signature is compiled by recursively traversing the `Lam` constructors and building up the argument list.
+Finally, the `Ret` or `Ptr` case combines the arguments to produce the function signature.
+The compilation of the function body is delegated to the Feldspar compiler (by calling `compExp`).
+
+The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an example of how the `Signature` language can generate interface code.
+``` {.haskell .skip firstnumber=24}
+    go fun@(Lam n@(Native l) f) prelude = do
+      t <- compTypeF (elemProxy n fun)
+      i <- freshId
+      let w = varExp i
+      C.Var (C.Id m _) _ <- compExp w
+      let n = m ++ "_buf"
+      withAlias i ('&':m) $ go (f w) $ do
+        prelude
+        len <- compExp l
+        addLocal [cdecl| struct array $id:m = { .buffer = $id:n
+                                              , .length=$len
+                                              , .elemSize=sizeof($ty:t)
+                                              , .bytes=sizeof($ty:t)*$len
+                                              }; |]
+        addParam [cparam| $ty:t * $id:n |]
+```
+Apart from allocating a fresh parameter, it creates a local `struct array`{.C} object (lines 33--37) on the function stack and initializes it with the length `l` and the buffer parameter.
+Then compilation continues with `f` applied to the address of the local `struct array`{.C} object.
+
+
+# Related Work
+
+MATLAB Coder [@matlab-coder][^MatlabCoder] is a tool that generates standalone C and C++ code from MATLAB code. One purpose of MATLAB Coder is to export MATLAB functions to an external system. Since MATLAB is dynamically typed, the same function can operate on values of different type. When generating C code, the user must specify a type for the function, and optionally sizes or size bounds for matrix arguments. This can be done on the command line using what can be seen as a restricted DSL.
+
+However, judging from code examples provided by MathWorks, the signature mapping of MATLAB Coder appears to be rather restricted. For example, stack allocated matrices are passed as two arguments: a pointer to a data buffer and a length vector. If a static size is given for the matrix, the length vector goes away. But if a different argument order is needed, or if one wants to use the same length vector for two different matrices, this likely requires introducing a wrapper function with a different interface.
+
+  <!-- See http://se.mathworks.com/help/fixedpoint/ug/c-code-interface-for-unbounded-arrays-and-structure-fields.html -->
+
+[^MatlabCoder]: Matlab Coder <http://www.mathworks.com/products/matlab-coder>
+
+
+
 # Discussion and Future Work
 
 The `Signature` language enables us to customize the signature of compiled Feldspar functions.
@@ -403,14 +418,10 @@ In future work, we will generalize the `Signature` language to work with any exp
 
 
 
-# Related Work
+# Acknowledgements {-}
 
-MATLAB Coder [@matlab-coder][^MatlabCoder] is a tool that generates standalone C and C++ code from MATLAB code. One purpose of MATLAB Coder is to export MATLAB functions to an external system. Since MATLAB is dynamically typed, the same function can operate on values of different type. When generating C code, the user must specify a type for the function, and optionally sizes or size bounds for matrix arguments. This can be done on the command line using what can be seen as a restricted DSL.
-
-However, judging from the officially available examples, the signature mapping of MATLAB Coder appears to be rather restricted. For example, stack allocated matrices are passed as two arguments: a pointer to a data buffer and a length vector. If a static size is given for the matrix, the length vector goes away. But if a different argument order is needed, or if one wants to use the same length vector for two different matrices, this likely requires introducing a wrapper function with a different interface.
-
-  <!-- See http://se.mathworks.com/help/fixedpoint/ug/c-code-interface-for-unbounded-arrays-and-structure-fields.html -->
-
-[^MatlabCoder]: Matlab Coder <http://www.mathworks.com/products/matlab-coder>
+This research is funded by the Swedish Foundation for Strategic
+Research (which funds the Resource Aware Functional Programming (RAW
+FP) Project) and the Swedish Research Council.
 
 # References
