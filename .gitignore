@@ -142,3 +142,8 @@ sympy-plots-for-*.tex/
 # WinEdt
 *.bak
 *.sav
+-h
+code.hs
+paper.pdf
+talk.html
+talk.pdf
