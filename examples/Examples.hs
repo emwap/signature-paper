@@ -32,7 +32,7 @@ sig6_3 = name "poly"   $ \p ->
          exposeLength  $ \v ->
          ret  "crc"    $ F.crcNaive p i $ F.sugar v
 
-crc :: F.Bits a
+crc :: (F.Bits a, F.Integral a)
     => Data a -> Data a -> Data [F.Word8] -> Data a
 -- crc p i v = F.share (F.makeCrcTable p)
 --           $ \t -> F.crcNormal t i $ F.sugar v
@@ -46,10 +46,12 @@ sig7 = name "ini" $ \i ->
 sig8_1 :: Signature ([F.Word8] -> [F.Word8] -> F.Word8)
 sig8_1 = lam $ \as ->
          lam $ \bs ->
-         ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
+         ret "scalarProd" $ F.scalarProd (F.sugar as F.-:: F.tPull1 id)
+                                         (F.sugar bs F.-:: F.tPull1 id)
 
 sig8_2 :: Signature (F.Length -> [F.Word8] -> [F.Word8] -> F.Word8)
 sig8_2 = name "len" $ \len ->
          native len $ \as ->
          native len $ \bs ->
-         ret "scalarProd" $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
+         ret "scalarProd" $ F.scalarProd (F.sugar as F.-:: F.tPull1 id)
+                                         (F.sugar bs F.-:: F.tPull1 id)
