@@ -46,7 +46,7 @@ import Feldspar.Compiler.Signature
 [^FeldsparCompilerHackage]: <https://hackage.haskell.org/package/feldspar-compiler>
 
 Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].[^FeldsparLanguageHackage]
-The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems , see reference [@persson2014towards].
+The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems, see reference [@persson2014towards].
 
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.[^FeldsparCompilerHackage]
 When translating a function signature, the compiler uses a specific calling convention as detailed in chapter 1.4.2 in reference [@persson2014towards]:
@@ -138,7 +138,7 @@ Dissatisfied with hard-wired rules and global compiler options, we propose a sma
 The Signature language allows the programmer to express the mapping of individual arguments separately.
 Specifically it allows the programmer to add annotations to every argument and control the data representation.
 These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
-Or, it can change the arity of the function by introducing new parameters, like the `native` and `exposeLength` combinators, which we will show later in this chapter.
+Or, it can change the arity of the function by introducing new parameters, like the `native` and `exposeLength` combinators in \cref{combinators}.
 
 Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
 The Signature language preserves the type safety of the Felspar language.
@@ -217,7 +217,7 @@ cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 To help alleviate these problems we can define smart constructors that modify the code before optimization.
 Note that these smart constructors are extensions to the `Signature` language and can be expressed by the end user.
 
-``` {.haskell .skip}
+``` {.haskell .skip #combinators caption="Smart signature constructors"}
 -- | Pass the argument as a native array of length @len@
 native :: (Type a)
        => Data Length -> (Data [a] -> Signature b) -> Signature ([a] -> b)
@@ -356,8 +356,8 @@ The concrete pieces of C code to be generated are written as actual C code using
 For example, consider the following two lines from \cref{lst:translate-sig}:
 
 ``` {.haskell .skip firstnumber=17}
-addParam [cparam| $ty:t *out |]
-addStm [cstm| *out = $e; |]
+        addParam [cparam| $ty:t *out |]
+        addStm [cstm| *out = $e; |]
 ```
 
 The first line adds a parameter to the generated C function, and the second line adds a statement that assigns the result to the output pointer. The `[q| ... |]` syntax is for quasi-quotation, where `q` is the name of the quoter. The quoter parses the C code inside the brackets, and turns it into a representation of a piece of code that can be collected in the code generation monad.

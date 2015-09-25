@@ -38,11 +38,11 @@ Abstract
 
 1.
 
-- [ ] <space>,<space>
+- [x] <space>,<space>
 
 2.
 
-- [ ] "later in the paper" => "in section ABC".
+- [x] "later in the paper" => "in section ABC".
 
 - [ ] In the definition native, the code uses the deep embedding, Lam and Native, without introduction.
       Further, what is F.<...> ? I can guess, but this should be explained.
@@ -56,7 +56,7 @@ Abstract
 
 "For example, consider the following two lines"
 
-- [ ] Indent them, because the code you are quoting has the indented.
+- [x] Indent them, because the code you are quoting has the indented.
 
  4.
 
@@ -89,4 +89,3 @@ before it is included in the final proceedings. In particular:
 - [ ] I think I would find it more convincing if the programmable signatures idea was described more generally,
       without using features specific to Feldspar, ideally with some examples in other domains (even if they are just toy examples).
       It's great to see an idea applied to a DSL which is used in practice, but additional (toy) examples would help to show more general applicability.
-
