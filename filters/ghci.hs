@@ -5,6 +5,7 @@ import Text.Pandoc.Walk
 import Language.Haskell.Interpreter
 import Language.Haskell.Interpreter.Unsafe
 
+main :: IO ()
 main = toJSONFilter doCodeBlocks
 
 extractCodeBlock :: String -> Block -> [Block]
@@ -18,10 +19,12 @@ codeFromBlock :: Block -> String
 codeFromBlock (CodeBlock _ code) = code
 
 processCodeBlock :: (MonadInterpreter m) => Block -> m Block
-processCodeBlock (CodeBlock (lbl,cls,kvs) code) | "ghci" `elem` cls = do
-  res <- eval code
-  return $ CodeBlock (lbl,cls,kvs) res
-processCodeBlock (CodeBlock attr@(_,cls,_) _) | "hide" `elem` cls = return $ Div attr [Null]
+processCodeBlock (CodeBlock attr@(lbl,cls,kvs) code)
+  | "ghci" `elem` cls
+  = CodeBlock (lbl,filter (/="ghci") cls,kvs) <$> eval code
+processCodeBlock (CodeBlock attr@(_,cls,_) _)
+  | "hide" `elem` cls
+  = return $ Div attr [Null]
 processCodeBlock b = return b
 
 doCodeBlocks :: Pandoc -> IO Pandoc

@@ -69,7 +69,7 @@ fft = id
 The type constructor `Data` denotes a Feldspar expression, and its parameter denotes the type of value computed by that expression. For historical reasons, Feldspar uses `[]` to denote immutable arrays.
 
 The compiler translates the `fft` function into the following C99 signature,
-``` {.ghci}
+``` {.ghci .C}
 cgenProto $ lam $ \xs -> ptr "fft" $ fft xs
 ```
 where `struct array`{.C} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
@@ -99,17 +99,18 @@ As a concrete example, take the following function for computing the scalar prod
 scProd :: Data [Double] -> Data [Double] -> Data Double
 ```
 ``` {.haskell .hide}
-scProd as bs = F.desugar $ F.scalarProd (F.thawPull1 as) (F.thawPull1 bs)
+scProd as bs = F.desugar $ F.scalarProd (F.sugar as F.-:: F.tPull1 id)
+                                        (F.sugar bs F.-:: F.tPull1 id)
 ```
 The generated signature with the default mapping is:
 
-``` {.ghci}
+``` {.ghci .C}
 cgenProto $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
 By default, the Feldspar compiler automatically makes up names for the arguments.
 Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
 
-``` {.ghci}
+``` {.ghci .C}
 cgenProto $ name "len" $ \len -> native len $ \as -> native len $ \bs -> ret "scProd" $ scProd as bs
 ```
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
@@ -170,7 +171,7 @@ We can mimic the standard rules of the Feldspar compiler by wrapping the functio
 ex1 = lam $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 which generates the following C signature when compiled
-``` {.ghci}
+``` {.ghci .C}
 cgenProto ex1
 ```
 
@@ -179,7 +180,7 @@ Using `name` instead of `lam`, we change the embedding to name the first argumen
 ex2 = name "xs" $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 resulting in
-``` {.ghci}
+``` {.ghci .C}
 cgenProto ex2
 ```
 
@@ -189,7 +190,7 @@ ex3 = name "xs" $ \xs -> name "ys" $ \ys -> ret "scProd" (scProd xs ys)
 ```
 which produces
 
-``` {.ghci}
+``` {.ghci .C}
 cgenProto ex3
 ```
 
@@ -210,7 +211,7 @@ In earlier versions it suffered from two problems.
 1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 6 below).
 2. The arrays are passed using a `struct array`{.C} pointer which results in extra dereferencing (line 9 below).
 
-``` {.ghci}
+``` {.ghci .C}
 cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
 
@@ -244,7 +245,7 @@ scProdNative = name "len" $ \len ->
                ret "scProd" $ scProd as bs
 ```
 which compiles to:
-``` {.ghci}
+``` {.ghci .C}
 cgenDefinition scProdNative
 ```
 
