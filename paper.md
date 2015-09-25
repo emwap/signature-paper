@@ -7,8 +7,7 @@ author:
 abstract: |
   When compiling Embedded Domain Specific Languages (EDSLs) into other languages, the compiler translates types in the source language into corresponding types in the target language.
   The translation is often driven by a small set of rules that map a single type in the source language into a single type in the target language.
-  This simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and performance in the generated code.
-
+  This simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and poor performance in the generated code.
   Instead of hard-wiring a single set of translation rules into a compiler, this paper introduces a small language that lets the programmer describe the mapping of each argument and function separately.
 
 numbersections: true
@@ -411,7 +410,7 @@ It also allows generation of interface code fused with the original function.
 Why is a new language needed?
 Why not just add annotations to the `Lam`{.haskell} abstraction constructor in the Feldspar Core language?
 
-The `Signature` language is a proper extension of the Feldspar Core language, which it means it is optional and can co-exist with other extensions.
+The `Signature` language is a proper extension of the Feldspar Core language, which means it is optional and can co-exist with other extensions.
 Since the `Signature` is built using a combination of deep and shallow embedding, the language is possible to extend by the end user.
 Also, the `Signature` language can be seen as a replacement for the top-level lambda abstractions in the Feldspar expression.
 
