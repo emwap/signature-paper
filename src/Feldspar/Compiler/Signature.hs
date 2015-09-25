@@ -83,6 +83,9 @@ data Signature a where
   Lam    :: (Type a)
          => Ann a -> (Data a -> Signature b) -> Signature (a -> b)
 
+instance Show Doc where
+  show = pretty 78
+
 cgenSig :: Signature a -> Doc
 cgenSig = prettyCGen . translateFunction
 
