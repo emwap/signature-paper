@@ -55,10 +55,10 @@ The purpose of Feldspar is to implement high-performance software, especially in
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.[^FeldsparCompilerHackage]
 When translating a function signature, the compiler uses a specific calling convention as detailed in chapter 1.4.2 in reference [@persson2014towards]:
 
-- All functions return `void`{.C}
+- All functions return `void`{.c}
 - Scalar values are passed by value
 - Structured values (structs, arrays) are passed by reference
-- Arrays are represented using a data structure `struct array`{.C}
+- Arrays are represented using a data structure `struct array`{.c}
 - Return values are passed through caller provided pointers
 
 For example, the following is the type of an FFT function in Feldspar:
@@ -72,10 +72,10 @@ fft = id
 The type constructor `Data` denotes a Feldspar expression, and its parameter denotes the type of value computed by that expression. For historical reasons, Feldspar uses `[]` to denote immutable arrays.
 
 The compiler translates the `fft` function into the following C99 signature,
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto $ lam $ \xs -> ptr "fft" $ fft xs
 ```
-where `struct array`{.C} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
+where `struct array`{.c} is a Feldspar specific data structure with metadata, such as the number of elements, and a pointer to the data area.
 
 The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. The convention ensures that all arguments fit into a register, which helps avoid spilling arguments to the call stack. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
 
@@ -107,13 +107,13 @@ scProd as bs = F.desugar $ F.scalarProd (F.sugar as F.-:: F.tPull1 id)
 ```
 The generated signature with the default mapping is:
 
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
 By default, the Feldspar compiler automatically makes up names for the arguments.
-Apart from the problem that Feldspar's `struct array` is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
+Apart from the problem that Feldspar's `struct array`{.c} is an unconventional array representation, this code may also be considered too general: it has to cater for the fact that the arrays may have different lengths. Since it does not make sense to call `scProd` with arrays of different lengths, a more appropriate signature might be:
 
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto $ name "len" $ \len -> native len $ \as -> native len $ \bs -> ret "scProd" $ scProd as bs
 ```
 Here, the arrays are passed as two pointers to the corresponding data buffers and a single length argument. This signature is more likely to occur in a practical system, and it has the advantage that the function does not have to decide what to do if the lengths are different. However, the system may expect a different order of the arguments, and might expect the result to be passed by value instead of by reference.
@@ -122,7 +122,7 @@ In addition to being able to customize the calling convention, we might also wan
 For example, we can name arguments for readability and debugging purposes.
 This is helpful since Feldspar is an embedded language and that syntactic information is lost when the Haskell compiler reads the source file.
 
-In future work we want to extend the annotations to include attributes to help the C compiler, including `restrict`{.C} and `volatile`{.C}.
+In future work we want to extend the annotations to include attributes to help the C compiler, including `restrict`{.c} and `volatile`{.c}.
 
 
 
@@ -175,7 +175,7 @@ ex1 :: Signature ([Double] -> [Double] -> Double)
 ex1 = lam $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 which generates the following C signature when compiled
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto ex1
 ```
 
@@ -185,7 +185,7 @@ ex2 :: Signature ([Double] -> [Double] -> Double)
 ex2 = name "xs" $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 resulting in
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto ex2
 ```
 
@@ -196,7 +196,7 @@ ex3 = name "xs" $ \xs -> name "ys" $ \ys -> ret "scProd" (scProd xs ys)
 ```
 which produces
 
-``` {.ghci .C}
+``` {.ghci .c}
 cgenProto ex3
 ```
 
@@ -217,7 +217,7 @@ In earlier versions it suffered from two problems.
 1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 6 below).
 2. The arrays are passed using a `struct array`{.C} pointer which results in extra dereferencing (line 9 below).
 
-``` {.ghci .C}
+``` {.ghci .c}
 cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 ```
 
@@ -228,7 +228,7 @@ Note that these smart constructors are extensions to the `Signature` language an
 -- | Pass the argument as a native array of length @len@
 native :: (Type a)
        => Data Length -> (Data [a] -> Signature b) -> Signature ([a] -> b)
-native l f = Lam (Native l) $ \a -> f $ F.setLength l a
+native l f = Lam (Native l) $ \a -> f $ setLength l a
 
 -- | Expose the length of an array
 exposeLength :: (Type a)
@@ -238,7 +238,7 @@ exposeLength f = name "len" $ \l -> native l f
 
 The `native`{.haskell} function changes the array type to a native C array with length `l`.
 By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments.
-In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array` formats.
+In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array`{.c} formats.
 
 The `exposeLength`{.haskell} function adds an extra length argument to the signature and passes this length to `native`. The effect is to break up a standard array argument into two arguments: a length and a native array.
 
@@ -251,13 +251,13 @@ scProdNative = name "len" $ \len ->
                ret "scProd" $ scProd as bs
 ```
 which compiles to:
-``` {.ghci .C}
+``` {.ghci .c}
 cgenDefinition scProdNative
 ```
 
 Note how the Feldspar compiler now realizes that both vectors have the same length, and thus removes the defensive minimum length calculation.
 
-The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.C} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays throughout the generated code, when stated so in the signature, but that requires a change to the Feldspar compiler and is out of scope for this paper.
+The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.c} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays throughout the generated code, when stated so in the signature, but that requires a change to the Feldspar compiler and is out of scope for this paper.
 
 
 
@@ -350,7 +350,6 @@ translateFunction sig = go sig (return ())
     elemProxy _ _ = Proxy
 ```
 
-\pagebreak
 
 The code generator is defined in \cref{lst:translate-sig}. Before explaining how it works, we will explain the code generation technique used.
 
@@ -393,8 +392,8 @@ The `Lam (Native l)` case (lines 24--38 from \cref{lst:translate-sig}) is an exa
                                               }; |]
         addParam [cparam| $ty:t * $id:n |]
 ```
-Apart from allocating a fresh parameter, it creates a local `struct array`{.C} object (lines 33--37) on the function stack and initializes it with the length `l` and the buffer parameter.
-Then compilation continues with `f` applied to the address of the local `struct array`{.C} object.
+Apart from allocating a fresh parameter, it creates a local `struct array`{.c} object (lines 33--37) on the function stack and initializes it with the length `l` and the buffer parameter.
+Then compilation continues with `f` applied to the address of the local `struct array`{.c} object.
 
 
 # Related Work
