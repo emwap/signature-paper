@@ -77,6 +77,7 @@ before it is included in the final proceedings. In particular:
       Are there likely other contexts where this approach is necessary, or is it specific to Feldspar?
       As decribed, it feels mostly like an implementation detail, even if it is an interesting one.
 
+      * [x] Create a generalized implementation
       * [ ] Release library and point to its generality
 
 - [ ] are there other ways this problem could be addressed?
