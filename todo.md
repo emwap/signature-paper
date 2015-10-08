@@ -21,7 +21,7 @@ the proposed Signature EDSL.
 
   * We don't currently have a way to avoid inlining of functions, but any method for specifying that a function should not be inlined would also handle the calling properly.
 
-- [ ] On page 4, it would be useful to explicitly give the (Haskell) type of ex1 (which is the same as for ex2 and ex3, of course).
+- [x] On page 4, it would be useful to explicitly give the (Haskell) type of ex1 (which is the same as for ex2 and ex3, of course).
 
 - [ ] On the middle of page 5, I don't understand what is meant by the 2. item.
 - [ ] What extra dereferencing in line 9 are meant? And in what sense are they "extra"?

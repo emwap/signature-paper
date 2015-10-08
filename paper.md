@@ -30,7 +30,11 @@ import Feldspar (Data,Word32)
 import qualified Feldspar as F
 import qualified Feldspar.Vector as F
 import qualified Feldspar.Algorithm.CRC as F
-import Feldspar.Compiler.Signature
+import Feldspar.Compiler.Signature hiding (Ann,Signature)
+import qualified Feldspar.Compiler.Signature as S
+
+type Ann a = S.Ann F.Data a
+type Signature a = S.Signature F.Data a
 ```
 
 
@@ -167,6 +171,7 @@ scProd :: Data [Double] -> Data [Double] -> Data Double
 We can mimic the standard rules of the Feldspar compiler by wrapping the function in our combinators.
 
 ``` {.haskell}
+ex1 :: Signature ([Double] -> [Double] -> Double)
 ex1 = lam $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 which generates the following C signature when compiled
@@ -176,6 +181,7 @@ cgenProto ex1
 
 Using `name` instead of `lam`, we change the embedding to name the first argument
 ``` {.haskell}
+ex2 :: Signature ([Double] -> [Double] -> Double)
 ex2 = name "xs" $ \xs -> lam $ \ys -> ptr "scProd" (scProd xs ys)
 ```
 resulting in
@@ -185,6 +191,7 @@ cgenProto ex2
 
 Finally, we change the function to return by value, by using `ret` instead of `ptr`
 ``` {.haskell}
+ex3 :: Signature ([Double] -> [Double] -> Double)
 ex3 = name "xs" $ \xs -> name "ys" $ \ys -> ret "scProd" (scProd xs ys)
 ```
 which produces
