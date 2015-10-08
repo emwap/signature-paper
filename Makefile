@@ -16,13 +16,13 @@ PAPER_OPTS += --filter filters/fix-biblio.hs
 PAPER_OPTS += --filter filters/ghci.hs
 
 paper.tex: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
-	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
+	stack exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
 paper.pdf: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
-	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
+	stack exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
 paper.json: paper.md paper.bib Makefile filters/fix-biblio.hs filters/ghci.hs listings_haskell.tex
-	cabal exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
+	stack exec -- pandoc -o $@ paper.md ${PAPER_OPTS}
 
 TEX_OPTS += ${OPTS}
 TEX_OPTS += -t beamer
@@ -30,10 +30,10 @@ TEX_OPTS += --incremental
 TEX_OPTS += --template beamer.latex
 
 talk.pdf: talk.md paper.bib beamer.latex Makefile
-	pandoc -o talk.pdf talk.md ${TEX_OPTS}
+	stack exec -- pandoc -o talk.pdf talk.md ${TEX_OPTS}
 
 talk.tex: talk.md paper.bib Makefile
-	pandoc -o talk.tex talk.md ${TEX_OPTS}
+	stack exec -- pandoc -o talk.tex talk.md ${TEX_OPTS}
 
 HTML_OPTS += ${OPTS}
 HTML_OPTS += --template revealjs.html
