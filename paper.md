@@ -131,7 +131,8 @@ In future work we want to extend the annotations to include attributes to help t
 To address the problems above, this paper presents two contributions:
 
 - We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (\cref{the-signature-language}).
-- We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (\cref{implementation}). The implementation relies on a simple interface to the underlying compiler, and the technique can easily be ported to other EDSLs for which the compiler implements the same interface.
+- We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (\cref{implementation}). The implementation relies on a simple interface to the underlying compiler.
+- A generalized version of the implementation and the interface are provided as part of the `imperative-edsl` package.
 
 
 
@@ -215,7 +216,7 @@ For example, consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
 
 1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 6 below).
-2. The arrays are passed using a `struct array`{.C} pointer which results in extra dereferencing (line 9 below).
+2. The arrays are passed using a `struct array`{.c} pointer which results in extra dereferencing (the `at` macros in line 9 below).
 
 ``` {.ghci .c}
 cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
@@ -269,6 +270,9 @@ The shallow embedding (\cref{lst:signature-shallow}), which is also the programm
 The deep embedding (\cref{lst:signature-deep}) is interpreted by the compiler to apply the rules.
 
 By using two separate embeddings it is possible to have a small set of constructs that the compiler has to deal with, while at the same time provide a rich set of combinators to the end user. For example, the `exposeLength` function could be implemented purely in terms of simpler constructs. This way of combining deep and shallow embeddings has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
+
+In this paper we show the implementation specialized to the Feldspar language.
+A generalized version of the implementation is provided as part of the `imperative-edsl` library.
 
 ``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
