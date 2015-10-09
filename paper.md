@@ -59,7 +59,7 @@ type VarId = Integer
 [^FeldsparCompilerHackage]: <https://hackage.haskell.org/package/feldspar-compiler>
 
 Feldspar is an embedded domain specific language written in Haskell [@axelsson2010feldspar; @axelsson2010design].[^FeldsparLanguageHackage]
-The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems, see reference [@persson2014towards].
+The purpose of Feldspar is to implement high-performance software, especially in the domain of signal processing in embedded systems [@persson2014towards].
 
 Feldspar comes with an optimizing compiler that translates Feldspar expressions into C99 code.[^FeldsparCompilerHackage]
 When translating a function signature, the compiler uses a specific calling convention as detailed in chapter 1.4.2 in reference [@persson2014towards]:
