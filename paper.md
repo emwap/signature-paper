@@ -285,7 +285,7 @@ In the future, we plan to make it possible to use native arrays throughout the g
 
 The language is implemented as a simple deep embedding (\cref{lst:signature-deep}) on top of which the programmer interface in \cref{lst:signature-shallow} is defined. The simplicity of the deep embedding means that the compiler has a small set of constructs to deal with. Still it supports the definition of a richer interface to the user. For example, the `exposeLength` function could be implemented entirely in terms of simpler constructs. This way of combining a deep embedding with shallow user-facing functions has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
 
-``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
+``` {.haskell .skip #lst:signature-deep style=floatbottom caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
 data Ann a where
   Empty  :: Ann a
