@@ -49,7 +49,7 @@ Abstract
 
 3
 
-- [ ] (Emil?) Be specific about how you are combining deep and shallow.
+- [x] (Emil?) Be specific about how you are combining deep and shallow.
       This looking like just a deep embedding to me (or the shallow is really a simple wrapper to deep.
       Are you talking about the use of HOAS?
 
