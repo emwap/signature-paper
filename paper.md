@@ -258,9 +258,8 @@ exposeLength :: (Type a)
              => (Data [a] -> Signature b) -> Signature (Length -> [a] -> b)
 exposeLength f = name "len" $ \l -> native l f
 ```
+The `native`{.haskell} function changes an array argument to a native C array with length `l`. `Lam`{.haskell} is a constructor of the `Signature`{.haskell} type (see \cref{implementation}). It is like `lam`{.haskell}, except that it takes an extra annotation as argument. In this case, the annotation `Native l`{.haskell} says that the argument bound by `Lam`{.haskell} should be a native C array of length `l`. By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments, so that the function `f`{.haskell} can use the argument as an ordinary Feldspar array that has an associated length.
 
-The `native`{.haskell} function changes the array type to a native C array with length `l`.
-By using the Feldspar `setLength`{.haskell} function, size information is added to the array arguments.
 In \cref{implementation} we show how the `Native` constructor produces the interface code needed to translate between native and `struct array`{.c} formats.
 
 The `exposeLength`{.haskell} function adds an extra length argument to the signature and passes this length to `native`. The effect is to break up a standard array argument into two arguments: a length and a native array.

@@ -44,7 +44,7 @@ Abstract
 
 - [x] "later in the paper" => "in section ABC".
 
-- [ ] (Emil?) In the definition native, the code uses the deep embedding, Lam and Native, without introduction.
+- [x] (Emil?) In the definition native, the code uses the deep embedding, Lam and Native, without introduction.
       Further, what is F.<...> ? I can guess, but this should be explained.
 
 3
