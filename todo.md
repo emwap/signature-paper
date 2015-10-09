@@ -46,12 +46,12 @@ Abstract
 
 - [x] "later in the paper" => "in section ABC".
 
-- [ ] In the definition native, the code uses the deep embedding, Lam and Native, without introduction.
+- [ ] (Emil?) In the definition native, the code uses the deep embedding, Lam and Native, without introduction.
       Further, what is F.<...> ? I can guess, but this should be explained.
 
 3
 
-- [ ] Be specific about how you are combining deep and shallow.
+- [ ] (Emil?) Be specific about how you are combining deep and shallow.
       This looking like just a deep embedding to me (or the shallow is really a simple wrapper to deep.
       Are you talking about the use of HOAS?
 
