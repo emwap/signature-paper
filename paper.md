@@ -111,12 +111,10 @@ With a fixed signature mapping, it is easy to derive the target language type fr
 In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for more than one array if they always have the same length? And so on.
 
 Even if we allow flags to customize the compiler, a fixed set of mapping rules will never be able to cover all possible situations. Instead, we would like to put the exported signature in the hands of the programmer.
-
   <!--
 Many compilers provide options to change the interpretation of program elements.
 However, these options take effect for the entire invocation of the compiler, meaning that it is not possible to apply options only to some elements.
   -->
-
 As a concrete example, take the following function for computing the scalar product of two vectors:
 
 ``` {.haskell}
@@ -149,7 +147,7 @@ In future work we want to extend the annotations to include attributes to help t
 
 ## Contributions
 
-To address the problems above, this paper presents two contributions:
+To address the problems above, this paper presents three contributions:
 
 - We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (\cref{the-signature-language}).
 - We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (\cref{implementation}). The implementation relies on a simple interface to the underlying compiler.
