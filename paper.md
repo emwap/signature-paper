@@ -437,11 +437,13 @@ Since the `Signature` is built using a combination of deep and shallow embedding
 Also, the `Signature` language can be seen as a replacement for the top-level lambda abstractions in the Feldspar expression.
 
 A generalized implementation of the `Signature` language is available in the `imperative-edsl` package.
-That implementation works with any expression language that supports the interface in \cref{compexp-interface}.
+That implementation works with any expression language that supports the interface in \cref{general-implementation}.
 
-``` {.haskell #compexp-interface style=float caption="General interface for compiling expressions (from imperative-edsl)"}
+``` {.haskell .skip #general-implementation style=float caption="Generalized implementation"}
+-- | Variable predicate paramterized on expression type
 type family VarPred (exp :: * -> *) :: * -> Constraint
 
+-- | General interface for compiling expressions
 class CompExp exp where
   -- | Variable expressions
   varExp   :: (VarPred exp a)           => VarId -> exp a
@@ -449,6 +451,19 @@ class CompExp exp where
   compExp  :: (MonadC m, VarPred exp a) => exp a -> m Exp
   -- | Compile the C type of an expression
   compType :: (MonadC m, VarPred exp a) => exp a -> m Type
+
+-- | Signature annotations
+data Ann exp a where
+  Empty  :: Ann exp a
+  Named  :: String -> Ann exp a
+  Native :: (VarPred exp a) => exp len -> Ann exp [a]
+
+-- | Signatures
+data Signature exp a where
+  Ret    :: (VarPred exp a) => String -> exp a -> Signature exp a
+  Ptr    :: (VarPred exp a) => String -> exp a -> Signature exp a
+  Lam    :: (VarPred exp a) => Ann exp a -> (exp a -> Signature exp b)
+         -> Signature exp (a -> b)
 ```
 
 # Acknowledgements {-}
