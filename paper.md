@@ -440,18 +440,6 @@ A generalized implementation of the `Signature` language is available in the `im
 That implementation works with any expression language that supports the interface in \cref{general-implementation}.
 
 ``` {.haskell .skip #general-implementation style=float caption="Generalized implementation"}
--- | Variable predicate paramterized on expression type
-type family VarPred (exp :: * -> *) :: * -> Constraint
-
--- | General interface for compiling expressions
-class CompExp exp where
-  -- | Variable expressions
-  varExp   :: (VarPred exp a)           => VarId -> exp a
-  -- | Compile an @exp@ expression into a C expression
-  compExp  :: (MonadC m, VarPred exp a) => exp a -> m Exp
-  -- | Compile the C type of an expression
-  compType :: (MonadC m, VarPred exp a) => exp a -> m Type
-
 -- | Signature annotations
 data Ann exp a where
   Empty  :: Ann exp a
