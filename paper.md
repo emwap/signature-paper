@@ -226,7 +226,7 @@ For example, consider the `scProd`{.haskell} function again.
 In earlier versions it suffered from two problems.
 
 1. The two arrays may have different lengths and the generated code has to defensively calculate the minimum length (see line 6 below).
-2. The arrays are passed using a `struct array`{.c} pointer which results in extra dereferencing (the `at` macros in line 9 below).
+2. The arrays are passed using a `struct array`{.c} pointer which results in extra dereferencing. On line 9 below `at` is a macro that indexes into a `struct array` and to do that it must do an extra dereference to find the buffer.
 
 ``` {.ghci .c}
 cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
@@ -243,7 +243,7 @@ native l f = Lam (Native l) $ \a -> f $ setLength l a
 
 -- | Expose the length of an array
 exposeLength :: (Type a)
-             => (Data [a] -> Signature b) -> Signature (F.Length -> [a] -> b)
+             => (Data [a] -> Signature b) -> Signature (Length -> [a] -> b)
 exposeLength f = name "len" $ \l -> native l f
 ```
 
@@ -253,7 +253,7 @@ In \cref{implementation} we show how the `Native` constructor produces the inter
 
 The `exposeLength`{.haskell} function adds an extra length argument to the signature and passes this length to `native`. The effect is to break up a standard array argument into two arguments: a length and a native array.
 
-With our new combinators, we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length.
+With our new combinators, we can create a version of the `scProd` function that accepts native arrays of a fixed (runtime specified) length
 
 ``` {.haskell}
 scProdNative = name "len" $ \len ->
@@ -288,7 +288,7 @@ A generalized version of the implementation is provided as part of the `imperati
 -- | Annotations to place on arguments or result
 data Ann a where
   Empty  :: Ann a
-  Native :: Type a => Data F.Length -> Ann [a]
+  Native :: Type a => Data Length -> Ann [a]
   Named  :: String -> Ann a
 
 -- | Annotation carrying signature description
