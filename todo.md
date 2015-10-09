@@ -85,7 +85,7 @@ before it is included in the final proceedings. In particular:
 
       * Yes...
 
-- [ ] a brief introduction to Feldspar would also be useful.
+- [x] a brief introduction to Feldspar would also be useful.
 
 - [ ] I think I would find it more convincing if the programmable signatures idea was described more generally,
       without using features specific to Feldspar, ideally with some examples in other domains (even if they are just toy examples).
