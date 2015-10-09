@@ -27,7 +27,7 @@ the proposed Signature EDSL.
 
   - The C compiler will in many cases optimize the access.
 
-- [ ] At the bottom of page 6, implying that only the shallow embedding is the programmer interface is a bit unclear.
+- [x] At the bottom of page 6, implying that only the shallow embedding is the programmer interface is a bit unclear.
       After all, the example at the bottom of page 5 already used the constructors from the deep embedding (and it was explicitly said there that the code for native and exposeLength comes from the end user).
 
 - [x] Page 10: "which it means it is" -> "which means it is"
