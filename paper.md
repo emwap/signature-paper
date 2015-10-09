@@ -316,7 +316,7 @@ compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
 
 The first function, `varExp`, is used to create a free variable in Feldspar. Naturally, this function is not exported to ordinary users. The function `compExp` is used to compile a Feldspar expression to a C expression `Exp`. Since compilation normally results in a number of C statements in addition to the expression, `compExp` returns in a monad `m` capable of collecting C statements that can later be pretty printed as C code. Finally, `compTypeF` is used to generate a C type from a type `a` constrained by Feldspar's `Type` class. The argument of type `proxy a` is just used to determine the type `a`.
 
-``` {.haskell .skip style=floatpage #lst:translate-sig caption="Signature translation" style=floathere}
+``` {.haskell .skip style=floatpage #lst:translate-sig caption="Signature translation"}
 -- | Compile a @Signature@ to C code
 translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
 translateFunction sig = go sig (return ())
