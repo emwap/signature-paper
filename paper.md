@@ -441,17 +441,17 @@ That implementation works with any expression language that supports the interfa
 
 ``` {.haskell .skip #general-implementation style=float caption="Generalized implementation"}
 -- | Signature annotations
-data Ann exp a where
-  Empty  :: Ann exp a
-  Named  :: String -> Ann exp a
-  Native :: (VarPred exp a) => exp len -> Ann exp [a]
+data Ann expr a where
+  Empty  :: Ann expr a
+  Named  :: String -> Ann expr a
+  Native :: (VarPred expr a) => expr len -> Ann expr [a]
 
 -- | Signatures
-data Signature exp a where
-  Ret    :: (VarPred exp a) => String -> exp a -> Signature exp a
-  Ptr    :: (VarPred exp a) => String -> exp a -> Signature exp a
-  Lam    :: (VarPred exp a) => Ann exp a -> (exp a -> Signature exp b)
-         -> Signature exp (a -> b)
+data Signature expr a where
+  Ret    :: (VarPred expr a) => String -> expr a -> Signature expr a
+  Ptr    :: (VarPred expr a) => String -> expr a -> Signature expr a
+  Lam    :: (VarPred expr a) => Ann expr a -> (expr a -> Signature expr b)
+         -> Signature expr (a -> b)
 ```
 
 # Acknowledgements {-}
