@@ -17,7 +17,7 @@ kinds of signature "deviations" from the standard calling convention
 that are desirable there, and the possibility of expressing them with
 the proposed Signature EDSL.
 
-- [ ] Explain that Feldspar functions are inlined by default.
+- [x] Explain that Feldspar functions are inlined by default.
 
   * We don't currently have a way to avoid inlining of functions, but any method for specifying that a function should not be inlined would also handle the calling properly.
 

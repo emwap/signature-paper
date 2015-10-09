@@ -90,6 +90,18 @@ The Feldspar compiler uses its calling convention for a number of reasons, but t
 
 A hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
 
+Note that the calling convention only applies to the main function that one wants to compile. Due to the embedding in Haskell, any helper functions that are used will be inlined into the main function before code generation. Take the following Feldspar program as an example:
+``` {.haskell}
+f :: Data Double -> Data Double
+f x = x*2
+
+g :: Data Double -> Data Double
+g y = f (y+1)
+```
+Compiling the function `g` is equivalent to compiling the function `\y -> (y+1)*2`.
+
+In the future, we want to allow the possibility of marking certain Feldspar functions as non-inlineable. But in that case, we expect that the compiler will automatically handle the internal calling conventions.
+
 
 
 ## Issues with Fixed Mappings
