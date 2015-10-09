@@ -22,7 +22,7 @@ the proposed Signature EDSL.
 - [x] On page 4, it would be useful to explicitly give the (Haskell) type of ex1 (which is the same as for ex2 and ex3, of course).
 
 - [x] On the middle of page 5, I don't understand what is meant by the 2. item.
-- [ ] What extra dereferencing in line 9 are meant? And in what sense are they "extra"?
+- [x] What extra dereferencing in line 9 are meant? And in what sense are they "extra"?
       Even when looking at the generated code at the middle of page 6, which supposedly is meant to improve the 1. and 2. aspects, I don't see somehow fewer dereferencing going on.
 
   - The C compiler will in many cases optimize the access.
