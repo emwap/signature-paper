@@ -274,7 +274,6 @@ which compiles to:
 ``` {.ghci .c}
 cgenDefinition scProdNative
 ```
-
 Note how the Feldspar compiler now realizes that both vectors have the same length, and thus removes the defensive minimum length calculation.
 
 The first two declarations in the generated code are for converting the native array in the interface to `struct array`{.c} which is what the body of the function expects. In the future, we plan to make it possible to use native arrays throughout the generated code, when stated so in the signature, but that requires a change to the Feldspar compiler and is out of scope for this paper.
@@ -284,7 +283,7 @@ The first two declarations in the generated code are for converting the native a
 
 # Implementation
 
-The language is implemented as a simple deep embedding (\cref{lst:signature-deep}) on top of which the programmer interface in \cref{lst:signature-shallow} is defined. The simplicity of the deep embedding means that the compiler only has a small set of constructs to deal with. Still it supports the definition of a richer interface to the user. For example, the `exposeLength` function could be implemented entirely in terms of simpler constructs. This way of combining a deep embedding with shallow user-facing functions has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
+The language is implemented as a simple deep embedding (\cref{lst:signature-deep}) on top of which the programmer interface in \cref{lst:signature-shallow} is defined. The simplicity of the deep embedding means that the compiler has a small set of constructs to deal with. Still it supports the definition of a richer interface to the user. For example, the `exposeLength` function could be implemented entirely in terms of simpler constructs. This way of combining a deep embedding with shallow user-facing functions has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
 
 ``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
@@ -318,7 +317,7 @@ compTypeF :: (MonadC m, Type a) => proxy a -> m C.Type
 
 The first function, `varExp`, is used to create a free variable in Feldspar. Naturally, this function is not exported to ordinary users. The function `compExp` is used to compile a Feldspar expression to a C expression `Exp`. Since compilation normally results in a number of C statements in addition to the expression, `compExp` returns in a monad `m` capable of collecting C statements that can later be pretty printed as C code. Finally, `compTypeF` is used to generate a C type from a type `a` constrained by Feldspar's `Type` class. The argument of type `proxy a` is just used to determine the type `a`.
 
-``` {.haskell .skip #lst:translate-sig caption="Signature translation" style=floathere}
+``` {.haskell .skip style=floatpage #lst:translate-sig caption="Signature translation" style=floathere}
 -- | Compile a @Signature@ to C code
 translateFunction :: forall m a. (MonadC m) => Signature a -> m ()
 translateFunction sig = go sig (return ())
