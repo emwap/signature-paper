@@ -26,6 +26,10 @@ header-includes: |
 
 
 ``` {.haskell .hide}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 import Feldspar (Data,Word32)
 import qualified Feldspar as F
 import qualified Feldspar.Vector as F
@@ -33,8 +37,13 @@ import qualified Feldspar.Algorithm.CRC as F
 import Feldspar.Compiler.Signature hiding (Ann,Signature)
 import qualified Feldspar.Compiler.Signature as S
 
+import Data.Constraint
+import Language.C.Monad (MonadC)
+import Language.C.Syntax (Exp, Type)
+
 type Ann a = S.Ann F.Data a
 type Signature a = S.Signature F.Data a
+type VarId = Integer
 ```
 
 
@@ -132,9 +141,10 @@ To address the problems above, this paper presents two contributions:
 
 - We define a simple EDSL to specify type conversions and annotations when exporting a Feldspar function to an external system (\cref{the-signature-language}).
 - We give an implementation of the EDSL as a small wrapper around the existing Feldspar compiler (\cref{implementation}). The implementation relies on a simple interface to the underlying compiler.
-- A generalized version of the implementation and the interface are provided as part of the `imperative-edsl` package.
+- A generalized version of the implementation and the interface are provided as part of the `imperative-edsl`[^ImperativeEdslHackage] package.
 
 
+[^ImperativeEdslHackage]: <https://hackage.haskell.org/package/imperative-edsl>
 
 # The Signature Language
 
@@ -419,14 +429,27 @@ It also allows generation of interface code fused with the original function.
 
 Why is a new language needed?
 Why not just add annotations to the `Lam`{.haskell} abstraction constructor in the Feldspar Core language?
+Simple annotations, like parameter naming, can be implemented using a combination of newtypes and type classes.
+In addition to simple annotations, the `Signature` language supports complex manipulations including changing the function arity.
 
 The `Signature` language is a proper extension of the Feldspar Core language, which means it is optional and can co-exist with other extensions.
 Since the `Signature` is built using a combination of deep and shallow embedding, the language is possible to extend by the end user.
 Also, the `Signature` language can be seen as a replacement for the top-level lambda abstractions in the Feldspar expression.
 
-In future work, we will generalize the `Signature` language to work with any expression language that supports the same interface (see \cref{code-generation}) as the Feldspar compiler.
+A generalized implementation of the `Signature` language is available in the `imperative-edsl` package.
+That implementation works with any expression language that supports the interface in \cref{compexp-interface}.
 
+``` {.haskell #compexp-interface style=float caption="General interface for compiling expressions (from imperative-edsl)"}
+type family VarPred (exp :: * -> *) :: * -> Constraint
 
+class CompExp exp where
+  -- | Variable expressions
+  varExp   :: (VarPred exp a)           => VarId -> exp a
+  -- | Compile an @exp@ expression into a C expression
+  compExp  :: (MonadC m, VarPred exp a) => exp a -> m Exp
+  -- | Compile the C type of an expression
+  compType :: (MonadC m, VarPred exp a) => exp a -> m Type
+```
 
 # Acknowledgements {-}
 
