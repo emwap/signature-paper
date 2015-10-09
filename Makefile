@@ -1,9 +1,12 @@
 .PHONY: all
 
-all: paper.pdf talk.pdf talk.html
+all: box talk.pdf talk.html
 
 clean:
 	rm -f paper.pdf talk.pdf talk.tex talk.html
+
+box: paper.pdf
+	cp paper.pdf ~/Dropbox/Artiklar/signature-paper.pdf
 
 OPTS += --smart
 OPTS += --bibliography paper.bib
