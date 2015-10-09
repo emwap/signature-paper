@@ -359,7 +359,8 @@ translateFunction sig = go sig (return ())
     go fun@(Lam (Named s) f) prelude = do
       t <- compTypeF (argProxy fun)
       i <- freshId
-      withAlias i s $ go (f $ varExp i) $ prelude >> addParam [cparam| $ty:t $id:s |]
+      withAlias i s $ go (f $ varExp i) $
+        prelude >> addParam [cparam| $ty:t $id:s |]
 
     argProxy :: Signature (b -> c) -> Proxy b
     argProxy _ = Proxy
