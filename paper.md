@@ -171,7 +171,7 @@ The Signature language preserves the type safety of the Felspar language.
 The Signature language interface is given in \cref{lst:signature-shallow}.
 The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `ret` and `ptr` are used to return the result of the function to be generated.
 
-``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language (shallow embedding)"}
+``` {.haskell .skip #lst:signature-shallow style=float caption="Signature language"}
 -- | Capture an argument
 lam :: (Type a) => (Data a -> Signature b) -> Signature (a -> b)
 
@@ -284,14 +284,7 @@ The first two declarations in the generated code are for converting the native a
 
 # Implementation
 
-The language is implemented as a combination of a shallow and a deep embedding.
-The shallow embedding (\cref{lst:signature-shallow}), which is also the programmer interface, provides combinators to describe the mapping of a function.
-The deep embedding (\cref{lst:signature-deep}) is interpreted by the compiler to apply the rules.
-
-By using two separate embeddings it is possible to have a small set of constructs that the compiler has to deal with, while at the same time provide a rich set of combinators to the end user. For example, the `exposeLength` function could be implemented purely in terms of simpler constructs. This way of combining deep and shallow embeddings has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
-
-In this paper we show the implementation specialized to the Feldspar language.
-A generalized version of the implementation is provided as part of the `imperative-edsl` library.
+The language is implemented as a simple deep embedding (\cref{lst:signature-deep}) on top of which the programmer interface in \cref{lst:signature-shallow} is defined. The simplicity of the deep embedding means that the compiler only has a small set of constructs to deal with. Still it supports the definition of a richer interface to the user. For example, the `exposeLength` function could be implemented entirely in terms of simpler constructs. This way of combining a deep embedding with shallow user-facing functions has been shown to be very powerful for implementing EDSLs [@svenningsson2013combining].
 
 ``` {.haskell .skip #lst:signature-deep style=float caption="Signature Language (deep embedding)"}
 -- | Annotations to place on arguments or result
@@ -309,6 +302,9 @@ data Signature a where
 ```
 
 We can think of `Signature` as adding top-level lambda abstraction and result annotations to the existing expression language `Data`. The use of a host-language function in the `Lam` constructor is commonly known as *higher-order abstract syntax* (HOAS) [@pfenning1988higher]. HOAS allows us to construct signatures without the need to generate fresh variable names. As we will see in \cref{code-generation}, names are instead generated when we generate code from the signature.
+
+In this paper we show the `Signature`{.haskell} implementation specialized to the Feldspar language.
+A generalized version of the implementation is provided as part of the `imperative-edsl` library.
 
 ## Code generation
 
