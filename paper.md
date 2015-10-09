@@ -247,7 +247,7 @@ cgenDefinition $ lam $ \as -> lam $ \bs -> ptr "scProd" $ scProd as bs
 To help alleviate these problems we can define smart constructors that modify the code before optimization.
 Note that these smart constructors are extensions to the `Signature` language and can be expressed by the end user.
 
-``` {.haskell .skip #combinators caption="Smart signature constructors"}
+``` {.haskell .skip style=float #combinators caption="Smart signature constructors"}
 -- | Pass the argument as a native array of length @len@
 native :: (Type a)
        => Data Length -> (Data [a] -> Signature b) -> Signature ([a] -> b)
