@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Describe the problem better
+- [x] Describe the problem better
 - [x] Indent code listings
 - [x] Specialize implementation for Feldspar
 - [x] Move Feldspar.System.Signature to Feldspar.Compiler.Signature
@@ -65,7 +65,7 @@ Abstract
 
 Other:
 
-- [ ] The passing of the length, via DSL, is close to dependent typing.
+- [-] The passing of the length, via DSL, is close to dependent typing.
       You might want to mention the relationship here.
 
       * Two-level language gives some of the same benefits as dependent types.
@@ -87,6 +87,6 @@ before it is included in the final proceedings. In particular:
 
 - [x] a brief introduction to Feldspar would also be useful.
 
-- [ ] I think I would find it more convincing if the programmable signatures idea was described more generally,
+- [-] I think I would find it more convincing if the programmable signatures idea was described more generally,
       without using features specific to Feldspar, ideally with some examples in other domains (even if they are just toy examples).
       It's great to see an idea applied to a DSL which is used in practice, but additional (toy) examples would help to show more general applicability.

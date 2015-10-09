@@ -5,7 +5,7 @@ author:
   - Anders Persson
   - Emil Axelsson
 abstract: |
-  When compiling Embedded Domain Specific Languages (EDSLs) into other languages, the compiler translates types in the source language into corresponding types in the target language.
+  When compiling Embedded Domain Specific Languages (\mbox{EDSLs}) into other languages, the compiler translates types in the source language into corresponding types in the target language.
   The translation is often driven by a small set of rules that map a single type in the source language into a single type in the target language.
   This simple approach is limiting when there are multiple possible mappings, and it may lead to poor interoperability and poor performance in the generated code.
   Instead of hard-wiring a single set of translation rules into a compiler, this paper introduces a small language that lets the programmer describe the mapping of each argument and function separately.
@@ -154,7 +154,7 @@ To address the problems above, this paper presents three contributions:
 - A generalized version of the implementation and the interface are provided as part of the `imperative-edsl`[^ImperativeEdslHackage] package.
 
 
-[^ImperativeEdslHackage]: <https://hackage.haskell.org/package/imperative-edsl>
+[^ImperativeEdslHackage]: <https://hackage.haskell.org/package/imperative-edsl-0.4>
 
 # The Signature Language
 
@@ -448,6 +448,9 @@ Also, the `Signature` language can be seen as a replacement for the top-level la
 
 A generalized implementation of the `Signature` language is available in the `imperative-edsl` package.
 That implementation works with any expression language that supports the interface in \cref{general-implementation}.
+The `imperative-edsl` repository[^ImperativeEdslGithub] contains an example with a different expression language.
+
+[^ImperativeEdslGithub]: <https://github.com/emilaxelsson/imperative-edsl/blob/signatures-camera-ready/examples/Signature.hs>
 
 ``` {.haskell .skip #general-implementation style=float caption="Generalized implementation"}
 -- | Signature annotations
