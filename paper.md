@@ -88,8 +88,6 @@ where `struct array`{.c} is a Feldspar specific data structure with metadata, su
 
 The Feldspar compiler uses its calling convention for a number of reasons, but the primary reasons are consistency and generality. The convention ensures that all arguments fit into a register, which helps avoid spilling arguments to the call stack. By passing arrays as references bundled with their length, the compiler can generate code that works with different array sizes and still preserve the same number of arguments.
 
-A hard-wired set of mapping rules can be restrictive and introduce performance penalties. Code generated from Feldspar will usually be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler. If the calling convention of the system differs from that of Feldspar, glue code has to be written to interface with functions generated from Feldspar.
-
 Note that the calling convention only applies to the main function that one wants to compile. Due to the embedding in Haskell, any helper functions that are used will be inlined into the main function before code generation. Take the following Feldspar program as an example:
 ``` {.haskell}
 f :: Data Double -> Data Double
@@ -106,7 +104,8 @@ In the future, we want to allow the possibility of marking certain Feldspar func
 
 ## Issues with Fixed Mappings
 
-With a fixed signature mapping, it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Instead, separate wrapper functions have to be written and maintained.
+With a fixed signature mapping, it is easy to derive the target language type from the source language type. But the fixed mapping leaves little room to change the generated signature to fit into existing software. Code generated from Feldspar will usually be part of a larger system, and the calling convention is naturally dictated by the system rather than by the Feldspar compiler.
+If the calling convention of the system differs from that of Feldspar, glue code has to be written to interface with functions generated from Feldspar.
 
 In a typical embedded system, arrays are passed as two arguments: a pointer to the data buffer and an integer that gives the number of elements of the array. However, there are many variations on this theme. Should the length come before or after the buffer? Can the length argument be used for more than one array if they always have the same length? And so on.
 
