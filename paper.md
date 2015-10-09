@@ -421,6 +421,11 @@ Then compilation continues with `f` applied to the address of the local `struct 
 
 # Related Work
 
+The purpose of the `Signature` language is to customize the compilation of embedded languages.
+It is related to Foreign Function Interfaces (FFI) which exist in many forms [@chakravarty2003haskell; @chakravarty2014foreign].
+With the FFI, the signature can be controlled by annotations (e.g. newtype argument wrappers), but annotations are typically limited to individual arguments.
+The `Signature` language takes the annotations further by allowing them to for example change the arity and the order of the arguments.
+
 MATLAB Coder [@matlab-coder][^MatlabCoder] is a tool that generates standalone C and C++ code from MATLAB code. One purpose of MATLAB Coder is to export MATLAB functions to an external system. Since MATLAB is dynamically typed, the same function can operate on values of different type. When generating C code, the user must specify a type for the function, and optionally sizes or size bounds for matrix arguments. This can be done on the command line using what can be seen as a restricted DSL.
 
 However, judging from code examples provided by MathWorks, the signature mapping of MATLAB Coder appears to be rather restricted. For example, stack allocated matrices are passed as two arguments: a pointer to a data buffer and a length vector. If a static size is given for the matrix, the length vector goes away. But if a different argument order is needed, or if one wants to use the same length vector for two different matrices, this likely requires introducing a wrapper function with a different interface.

@@ -80,7 +80,7 @@ before it is included in the final proceedings. In particular:
       * [x] Create a generalized implementation
       * [ ] Release library and point to its generality
 
-- [ ] are there other ways this problem could be addressed?
+- [x] are there other ways this problem could be addressed?
       For example, could there be a typeclass for 'Data' with different instances for describing the signatures?
 
       * Yes...
