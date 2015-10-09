@@ -60,7 +60,7 @@ Abstract
 
  4.
 
-- [ ] The related work is too short. This paper is about generating wrappers.
+- [x] The related work is too short. This paper is about generating wrappers.
       You could mention Haskell FFI, and Java's JNI, for example.
 
 Other:
