@@ -164,8 +164,8 @@ Specifically it allows the programmer to add annotations to every argument and c
 These annotations can be as simple as just giving a name to a parameter, using the `name` combinator.
 Or, it can change the arity of the function by introducing new parameters, like the `native` and `exposeLength` combinators in \cref{combinators}.
 
-Like the Feldspar language, the Signature language is a typed embedded domain specific language, embedded in Haskell.
-The Signature language preserves the type safety of the Felspar language.
+Like Feldspar, the Signature language is a typed domain specific language, embedded in Haskell.
+The Signature language preserves the type safety of Felspar.
 
 The Signature language interface is given in \cref{lst:signature-shallow}.
 The combinators `lam` and `name` are used to bind (and possibly annotate) an argument, while `ret` and `ptr` are used to return the result of the function to be generated.
